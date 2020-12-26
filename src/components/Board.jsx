@@ -1,11 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import Node from './Node';
 import styles from '../assets/styles/Board.css';
 
 const Board = () => {
+  const height = document.documentElement.clientHeight;
+  const width = document.documentElement.clientWidth;
+
+  let calculatedRows = Math.floor(height / 30) - 6;
+  let calculatedColumns = Math.floor(width / 30);
+
+  // calculatedRows = Math.floor(calculatedRows);
+
+  console.log(calculatedRows, calculatedColumns);
+
   const createNode = (row, column) => {
     return {
       column,
       row,
+      isStart:
+        row === Math.floor(calculatedRows / 2) &&
+        column === Math.floor(calculatedColumns / 4),
+      isFinish:
+        row === Math.floor(calculatedRows / 2) &&
+        column === Math.floor((3 * calculatedColumns) / 4),
       distance: Infinity,
       isVisited: false,
       isWall: false,
@@ -14,9 +31,9 @@ const Board = () => {
   };
   const createGrid = () => {
     const grid = [];
-    for (let row = 0; row < 20; row++) {
+    for (let row = 0; row < calculatedRows; row++) {
       const currentRow = [];
-      for (let column = 0; column < 50; column++) {
+      for (let column = 0; column < calculatedColumns; column++) {
         currentRow.push(createNode(row, column));
       }
       grid.push(currentRow);
@@ -26,8 +43,6 @@ const Board = () => {
 
   const [grid, setGrid] = useState(createGrid);
 
-  console.log(grid);
-
   return (
     <div className='container'>
       <table className={styles.grid}>
@@ -36,8 +51,17 @@ const Board = () => {
             return (
               <tr key={rowIdx}>
                 {row.map((node, nodeIdx) => {
-                  // const { row, col, isWall } = node;
-                  return <td key={nodeIdx}></td>;
+                  const { row, column, isWall, isFinish, isStart } = node;
+                  return (
+                    <Node
+                      key={nodeIdx}
+                      column={column}
+                      row={row}
+                      isFinish={isFinish}
+                      isStart={isStart}
+                      isWall={isWall}
+                    ></Node>
+                  );
                 })}
               </tr>
             );
