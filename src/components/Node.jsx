@@ -11,6 +11,7 @@ const Node = props => {
     : isWall
     ? 'wall-node'
     : '';
+
   return (
     <td className={`node ${typeOfNode}`} id={`node-${row}-${column}`}></td>
   );
