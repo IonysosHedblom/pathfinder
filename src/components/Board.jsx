@@ -9,21 +9,29 @@ const Board = () => {
   let calculatedRows = Math.floor(height / 30) - 6;
   let calculatedColumns = Math.floor(width / 30);
 
+  // START VALUES
+  // row === Math.floor(calculatedRows / 2) &&
+  // column === Math.floor(calculatedColumns / 4),
+  // FINISH VALUES
+  // row === Math.floor(calculatedRows / 2) &&
+  // column === Math.floor((3 * calculatedColumns) / 4),
+
+  const [nodeState, setNodeState] = useState({
+    column: null,
+    row: null,
+    start: row === null && column === null,
+    finish: row === null && column === null,
+    distance: Infinity,
+    isVisited: false,
+    previousNode: null,
+  });
+
   const createNode = (row, column) => {
-    return {
-      column,
-      row,
-      isStart:
-        row === Math.floor(calculatedRows / 2) &&
-        column === Math.floor(calculatedColumns / 4),
-      isFinish:
-        row === Math.floor(calculatedRows / 2) &&
-        column === Math.floor((3 * calculatedColumns) / 4),
-      distance: Infinity,
-      isVisited: false,
-      isWall: false,
-      previousNode: null,
-    };
+    setNodeState({
+      row: row,
+      column: column,
+    });
+    return nodeState;
   };
 
   const createGrid = () => {
@@ -38,9 +46,6 @@ const Board = () => {
     return grid;
   };
 
-  const [grid, setGrid] = useState(createGrid);
-  const [pressed, setPressed] = useState(false);
-
   const getNode = id => {
     let coordinates = id.split('-');
     let row = coordinates[0];
@@ -49,25 +54,34 @@ const Board = () => {
     return currentNode;
   };
 
-  const onMouseDown = (row, column) => {
-    if (getNode(currentId).isStart) {
-      setPressed = true;
-    }
-  };
+  const [grid, setGrid] = useState(createGrid);
+  const [pressed, setPressed] = useState(false);
 
-  const onMouseUp = () => {
-    setPressed = false;
-  };
+  // const onMouseDown = (row, column) => {
+  //   if (getNode(`${row}-${column}`).isStart) {
+  //     setPressed = true;
+  //   }
+  // };
+
+  // const onMouseEnter = () => {
+  //   if (pressed) {
+  //   }
+  // };
+
+  // const onMouseUp = () => {
+  //   setPressed = false;
+  // };
 
   return (
     <div className='container'>
+      {/* <button onClick={() => testHandleClick()}>Click here</button> */}
       <table className={styles.grid}>
         <tbody>
           {grid.map((row, rowIdx) => {
             return (
               <tr key={rowIdx}>
                 {row.map((node, nodeIdx) => {
-                  const { row, column, isWall, isFinish, isStart } = node;
+                  const { row, column, start, finish } = node;
 
                   return (
                     <Node
@@ -75,11 +89,10 @@ const Board = () => {
                       setPressed={setPressed}
                       getNode={getNode}
                       key={nodeIdx}
-                      column={column}
                       row={row}
-                      isFinish={isFinish}
-                      isStart={isStart}
-                      isWall={isWall}
+                      column={column}
+                      start={start}
+                      finish={finish}
                     ></Node>
                   );
                 })}
