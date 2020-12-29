@@ -3,21 +3,22 @@ import Node from './Node';
 import styles from '../assets/styles/Board.css';
 
 const Board = () => {
+  // Calculates number of rows and columns based on window height
   const height = document.documentElement.clientHeight;
   const width = document.documentElement.clientWidth;
 
   let calculatedRows = Math.floor(height / 30) - 6;
   let calculatedColumns = Math.floor(width / 30);
 
-  // START VALUES
-  // row === Math.floor(calculatedRows / 2) &&
-  // column === Math.floor(calculatedColumns / 4),
-  // FINISH VALUES
-  // row === Math.floor(calculatedRows / 2) &&
-  // column === Math.floor((3 * calculatedColumns) / 4),
+  // Initial start node coordinates
   const initialStartRow = Math.floor(calculatedRows / 2);
   const initialStartColumn = Math.floor(calculatedColumns / 4);
 
+  // Initial finish node coordinates
+  const initialFinishRow = Math.floor(calculatedRows / 2);
+  const initialFinishColumn = Math.floor((3 * calculatedColumns) / 4);
+
+  // Creates initial nodes for the grid once the component mounts
   const createNode = (row, column) => {
     return {
       row,
@@ -31,6 +32,7 @@ const Board = () => {
     };
   };
 
+  // Creates the grid
   const createInitialGrid = () => {
     const grid = [];
     for (let row = 0; row < calculatedRows; row++) {
@@ -43,23 +45,22 @@ const Board = () => {
     return grid;
   };
 
-  const getNode = id => {
-    let coordinates = id.split('-');
-    let row = coordinates[0];
-    let column = coordinates[1];
-    let currentNode = grid[row][column];
-    return currentNode;
-  };
-
+  // Grid is in the state
   const [grid, setGrid] = useState(createInitialGrid);
+
+  // State of when the startNode is pressed
   const [pressed, setPressed] = useState(false);
 
-  // Keeps track of the previous coordinates of the start node so the previous start nodes can be re-rendered into normal ones
+  // Keeps track of the previous coordinates of the start node
+  // so the previous start nodes can be re-rendered into normal nodes
   const [prevCoordinates, setPrevCoordinates] = useState([
     initialStartRow,
     initialStartColumn,
   ]);
 
+  // Replaces old start node with a normal node,
+  // then adds the new start node
+  // Returns a new grid with updated start node
   const setNewStartNode = (grid, row, column) => {
     const newGrid = grid.slice();
     const currentNode = grid[row][column];
@@ -80,11 +81,7 @@ const Board = () => {
     return newGrid;
   };
 
-  // const removeStartNodes = () => {
-  //   const startNode = document.querySelector('.start-node');
-  //   startNode.classList.remove('start-node');
-  // };
-
+  // Checks whether the node at (row, column) is the current start node
   const getStartNode = (row, column) => {
     const newGrid = grid.slice();
     const node = newGrid[row][column];
@@ -95,12 +92,15 @@ const Board = () => {
     }
   };
 
+  // Runs function above to see if the startnode has been pressed
   const handleMouseDown = (row, column) => {
     if (getStartNode(row, column)) {
       setPressed(true);
     }
   };
 
+  // Stores old start node coordinates in prevcoordinates state,
+  // then runs the function at line 68 to render a new grid with updated start node state
   const handleMouseEnter = (row, column) => {
     if (!pressed) return;
     setPrevCoordinates([row, column]);
@@ -109,6 +109,7 @@ const Board = () => {
     setGrid(newGrid);
   };
 
+  // No longer clicking, stop moving start node
   const handleMouseUp = () => {
     setPressed(false);
   };
@@ -126,7 +127,6 @@ const Board = () => {
 
                   return (
                     <Node
-                      getNode={getNode}
                       key={nodeIdx}
                       row={row}
                       column={column}
