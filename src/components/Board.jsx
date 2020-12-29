@@ -15,26 +15,25 @@ const Board = () => {
   // FINISH VALUES
   // row === Math.floor(calculatedRows / 2) &&
   // column === Math.floor((3 * calculatedColumns) / 4),
+  const initialStartRow = Math.floor(calculatedRows / 2);
+  const initialStartColumn = Math.floor(calculatedColumns / 4);
 
-  const [nodeState, setNodeState] = useState({
-    column: null,
-    row: null,
-    start: row === null && column === null,
-    finish: row === null && column === null,
-    distance: Infinity,
-    isVisited: false,
-    previousNode: null,
-  });
+  const [isNew, setIsNew] = useState(false);
 
   const createNode = (row, column) => {
-    setNodeState({
-      row: row,
-      column: column,
-    });
-    return nodeState;
+    return {
+      row,
+      column,
+      status:
+        row === initialStartRow && column === initialStartColumn ? 'start' : '',
+      isVisited: false,
+      isWall: false,
+      distance: Infinity,
+      previousNode: null,
+    };
   };
 
-  const createGrid = () => {
+  const createInitialGrid = () => {
     const grid = [];
     for (let row = 0; row < calculatedRows; row++) {
       const currentRow = [];
@@ -54,23 +53,55 @@ const Board = () => {
     return currentNode;
   };
 
-  const [grid, setGrid] = useState(createGrid);
+  const [grid, setGrid] = useState(createInitialGrid);
   const [pressed, setPressed] = useState(false);
 
-  // const onMouseDown = (row, column) => {
-  //   if (getNode(`${row}-${column}`).isStart) {
-  //     setPressed = true;
-  //   }
-  // };
+  const startNode = document.querySelector('.start-node');
 
-  // const onMouseEnter = () => {
-  //   if (pressed) {
-  //   }
-  // };
+  const setNewStartNode = (grid, row, column) => {
+    const newGrid = grid.slice();
+    const currentNode = grid[row][column];
 
-  // const onMouseUp = () => {
-  //   setPressed = false;
-  // };
+    let newNode = {
+      ...currentNode,
+      status: 'start',
+    };
+
+    newGrid[row][column] = newNode;
+
+    return newGrid;
+  };
+
+  const removeStartNodes = () => {
+    const startNode = document.querySelector('.start-node');
+    startNode.classList.remove('start-node');
+  };
+
+  const getStartNode = (row, column) => {
+    const newGrid = grid.slice();
+    const node = newGrid[row][column];
+    if (node.status === 'start') {
+      return node;
+    } else {
+      return false;
+    }
+  };
+
+  const handleMouseDown = (row, column) => {
+    if (getStartNode(row, column)) {
+      setPressed(true);
+    }
+  };
+
+  const handleMouseEnter = (row, column) => {
+    if (!pressed) return;
+    const newGrid = setNewStartNode(grid, row, column);
+    setGrid(newGrid);
+  };
+
+  const handleMouseUp = () => {
+    setPressed(false);
+  };
 
   return (
     <div className='container'>
@@ -81,18 +112,23 @@ const Board = () => {
             return (
               <tr key={rowIdx}>
                 {row.map((node, nodeIdx) => {
-                  const { row, column, start, finish } = node;
+                  const { row, column, status } = node;
 
                   return (
                     <Node
-                      pressed={pressed}
-                      setPressed={setPressed}
                       getNode={getNode}
                       key={nodeIdx}
                       row={row}
                       column={column}
-                      start={start}
-                      finish={finish}
+                      status={status}
+                      pressed={pressed}
+                      onMouseDown={(row, column) =>
+                        handleMouseDown(row, column)
+                      }
+                      onMouseEnter={(row, column) =>
+                        handleMouseEnter(row, column)
+                      }
+                      onMouseUp={() => handleMouseUp()}
                     ></Node>
                   );
                 })}
