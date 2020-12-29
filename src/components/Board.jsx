@@ -215,6 +215,7 @@ const Board = () => {
                       column={column}
                       status={status}
                       pressed={pressed}
+                      isFinishNodePressed={isFinishNodePressed}
                       onMouseDown={(row, column) =>
                         handleMouseDown(row, column)
                       }
