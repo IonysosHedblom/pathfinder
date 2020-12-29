@@ -18,8 +18,6 @@ const Board = () => {
   const initialStartRow = Math.floor(calculatedRows / 2);
   const initialStartColumn = Math.floor(calculatedColumns / 4);
 
-  const [isNew, setIsNew] = useState(false);
-
   const createNode = (row, column) => {
     return {
       row,
@@ -56,26 +54,36 @@ const Board = () => {
   const [grid, setGrid] = useState(createInitialGrid);
   const [pressed, setPressed] = useState(false);
 
-  const startNode = document.querySelector('.start-node');
+  // Keeps track of the previous coordinates of the start node so the previous start nodes can be re-rendered into normal ones
+  const [prevCoordinates, setPrevCoordinates] = useState([
+    initialStartRow,
+    initialStartColumn,
+  ]);
 
   const setNewStartNode = (grid, row, column) => {
     const newGrid = grid.slice();
     const currentNode = grid[row][column];
+    let previousNode = grid[prevCoordinates[0]][prevCoordinates[1]];
 
+    let newPreviousNode = {
+      ...previousNode,
+      status: '',
+    };
     let newNode = {
       ...currentNode,
       status: 'start',
     };
 
+    newGrid[prevCoordinates[0]][prevCoordinates[1]] = newPreviousNode;
     newGrid[row][column] = newNode;
 
     return newGrid;
   };
 
-  const removeStartNodes = () => {
-    const startNode = document.querySelector('.start-node');
-    startNode.classList.remove('start-node');
-  };
+  // const removeStartNodes = () => {
+  //   const startNode = document.querySelector('.start-node');
+  //   startNode.classList.remove('start-node');
+  // };
 
   const getStartNode = (row, column) => {
     const newGrid = grid.slice();
@@ -95,6 +103,8 @@ const Board = () => {
 
   const handleMouseEnter = (row, column) => {
     if (!pressed) return;
+    setPrevCoordinates([row, column]);
+
     const newGrid = setNewStartNode(grid, row, column);
     setGrid(newGrid);
   };
