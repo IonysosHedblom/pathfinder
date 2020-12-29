@@ -35,6 +35,19 @@
   animation-play-state: running;
 }
 
+.wall-node {
+  background-color: #0b0c10;
+  border-color: #0b0c10;
+  animation-name: specialNodes;
+  animation-duration: 1s;
+  animation-timing-function: ease-out;
+  animation-delay: 0;
+  animation-direction: alternate;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+  animation-play-state: running;
+}
+
 @keyframes specialNodes {
   0% {
     transform: scale(0.4);
