@@ -24,7 +24,11 @@ const Board = () => {
       row,
       column,
       status:
-        row === initialStartRow && column === initialStartColumn ? 'start' : '',
+        row === initialStartRow && column === initialStartColumn
+          ? 'start'
+          : row === initialFinishRow && column === initialFinishColumn
+          ? 'finish'
+          : '',
       isVisited: false,
       isWall: false,
       distance: Infinity,
@@ -51,11 +55,19 @@ const Board = () => {
   // State of when the startNode is pressed
   const [pressed, setPressed] = useState(false);
 
+  // State of when the finishNode is pressed
+  const [isFinishNodePressed, setIsFinishNodePressed] = useState(false);
+
   // Keeps track of the previous coordinates of the start node
   // so the previous start nodes can be re-rendered into normal nodes
   const [prevCoordinates, setPrevCoordinates] = useState([
     initialStartRow,
     initialStartColumn,
+  ]);
+
+  const [prevFinishCoordinates, setPrevFinishCoordinates] = useState([
+    initialFinishRow,
+    initialFinishColumn,
   ]);
 
   // Replaces old start node with a normal node,
@@ -64,16 +76,31 @@ const Board = () => {
   const setNewStartNode = (grid, row, column) => {
     const newGrid = grid.slice();
     const currentNode = grid[row][column];
+    let newNode;
+    let newPreviousNode;
     let previousNode = grid[prevCoordinates[0]][prevCoordinates[1]];
 
-    let newPreviousNode = {
-      ...previousNode,
-      status: '',
-    };
-    let newNode = {
-      ...currentNode,
-      status: 'start',
-    };
+    if (previousNode.status !== 'finish') {
+      newPreviousNode = {
+        ...previousNode,
+        status: '',
+      };
+    } else if (previousNode.status === 'finish') {
+      newPreviousNode = {
+        ...previousNode,
+      };
+    }
+
+    if (currentNode.status !== 'finish') {
+      newNode = {
+        ...currentNode,
+        status: 'start',
+      };
+    } else if (currentNode.status === 'finish') {
+      newNode = {
+        ...currentNode,
+      };
+    }
 
     newGrid[prevCoordinates[0]][prevCoordinates[1]] = newPreviousNode;
     newGrid[row][column] = newNode;
@@ -92,26 +119,82 @@ const Board = () => {
     }
   };
 
+  const setNewFinishNode = (grid, row, column) => {
+    const newGrid = grid.slice();
+    const currentNode = grid[row][column];
+    let newNode;
+    let newPreviousNode;
+    let previousNode = grid[prevFinishCoordinates[0]][prevFinishCoordinates[1]];
+
+    if (previousNode.status !== 'start') {
+      newPreviousNode = {
+        ...previousNode,
+        status: '',
+      };
+    } else if (previousNode.status === 'start') {
+      newPreviousNode = {
+        ...previousNode,
+      };
+    }
+
+    if (currentNode.status !== 'start') {
+      newNode = {
+        ...currentNode,
+        status: 'finish',
+      };
+    } else if (currentNode.status === 'start') {
+      newNode = {
+        ...currentNode,
+      };
+    }
+
+    newGrid[prevFinishCoordinates[0]][
+      prevFinishCoordinates[1]
+    ] = newPreviousNode;
+    newGrid[row][column] = newNode;
+
+    return newGrid;
+  };
+
+  const getFinishNode = (row, column) => {
+    const newGrid = grid.slice();
+    const node = newGrid[row][column];
+    if (node.status === 'finish') {
+      return node;
+    } else {
+      return false;
+    }
+  };
+
   // Runs function above to see if the startnode has been pressed
   const handleMouseDown = (row, column) => {
     if (getStartNode(row, column)) {
       setPressed(true);
+    } else if (getFinishNode(row, column)) {
+      setIsFinishNodePressed(true);
     }
   };
 
   // Stores old start node coordinates in prevcoordinates state,
   // then runs the function at line 68 to render a new grid with updated start node state
   const handleMouseEnter = (row, column) => {
-    if (!pressed) return;
-    setPrevCoordinates([row, column]);
+    if (!pressed && !isFinishNodePressed) return;
 
-    const newGrid = setNewStartNode(grid, row, column);
-    setGrid(newGrid);
+    if (pressed) {
+      setPrevCoordinates([row, column]);
+      const newGrid = setNewStartNode(grid, row, column);
+      setGrid(newGrid);
+    } else if (isFinishNodePressed) {
+      setPrevFinishCoordinates([row, column]);
+      const newGrid = setNewFinishNode(grid, row, column);
+      setGrid(newGrid);
+    }
   };
 
   // No longer clicking, stop moving start node
   const handleMouseUp = () => {
     setPressed(false);
+    setIsFinishNodePressed(false);
   };
 
   return (
