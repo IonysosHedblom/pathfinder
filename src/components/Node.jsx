@@ -4,13 +4,14 @@ import styles from '../assets/styles/Node.css';
 
 const Node = props => {
   const { row, column, status, onMouseDown, onMouseEnter, onMouseUp } = props;
+
   const typeOfNode =
     status === 'start'
-      ? 'start-node'
+      ? 'start'
       : status === 'finish'
-      ? 'finish-node'
+      ? 'finish'
       : status === 'wall'
-      ? 'wall-node'
+      ? 'wall'
       : '';
 
   return (
@@ -19,7 +20,7 @@ const Node = props => {
       onMouseEnter={() => onMouseEnter(row, column)}
       onMouseUp={() => onMouseUp()}
       className={`node ${typeOfNode}`}
-      id={`node-${row}-${column}`}
+      id={`${row}-${column}`}
     ></td>
   );
 };
