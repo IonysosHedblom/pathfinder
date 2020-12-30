@@ -73,11 +73,6 @@ const Board = () => {
     initialFinishColumn,
   ]);
 
-  const [backaTwo, setBackaTwo] = useState([
-    prevFinishCoordinates[0],
-    prevFinishCoordinates[1],
-  ]);
-
   // Replaces old start node with a normal node,
   // then adds the new start node
   // Returns a new grid with updated start node
@@ -86,39 +81,22 @@ const Board = () => {
     const currentNode = grid[row][column];
     const previousNode = grid[prevCoordinates[0]][prevCoordinates[1]];
 
-    let newNode;
-    let newPreviousNode;
+    if (currentNode.status === '') {
+      let newNode = {
+        ...currentNode,
+        status: 'start',
+      };
 
-    if (previousNode.status !== 'finish' && previousNode.status !== 'wall') {
-      newPreviousNode = {
+      newGrid[row][column] = newNode;
+    }
+
+    if (previousNode.status === 'start') {
+      let newPreviousNode = {
         ...previousNode,
         status: '',
       };
       newGrid[prevCoordinates[0]][prevCoordinates[1]] = newPreviousNode;
     }
-
-    if (currentNode.status !== 'finish' && currentNode.status !== 'wall') {
-      newNode = {
-        ...currentNode,
-        status: 'start',
-      };
-
-      newGrid[row][column] = newNode;
-    }
-
-    if (currentNode.status === 'wall') {
-      newNode = {
-        ...currentNode,
-        status: 'start',
-      };
-      newPreviousNode = {
-        ...currentNode,
-        status: 'wall',
-      };
-      newGrid[row][column] = newNode;
-    }
-
-    console.log(previousNode);
 
     return newGrid;
   };
@@ -227,9 +205,9 @@ const Board = () => {
     if (!pressed && !isFinishNodePressed && !pressedNode) return;
 
     if (pressed) {
-      setBackaTwo([prevCoordinates[0], prevCoordinates[1]]);
       setPrevCoordinates([row, column]);
       const newGrid = setNewStartNode(grid, row, column);
+
       setGrid(newGrid);
     } else if (isFinishNodePressed) {
       setPrevFinishCoordinates([row, column]);
