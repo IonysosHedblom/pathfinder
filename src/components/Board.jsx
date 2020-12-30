@@ -73,6 +73,11 @@ const Board = () => {
     initialFinishColumn,
   ]);
 
+  const [backaTwo, setBackaTwo] = useState([
+    prevFinishCoordinates[0],
+    prevFinishCoordinates[1],
+  ]);
+
   // Replaces old start node with a normal node,
   // then adds the new start node
   // Returns a new grid with updated start node
@@ -100,6 +105,20 @@ const Board = () => {
 
       newGrid[row][column] = newNode;
     }
+
+    if (currentNode.status === 'wall') {
+      newNode = {
+        ...currentNode,
+        status: 'start',
+      };
+      newPreviousNode = {
+        ...currentNode,
+        status: 'wall',
+      };
+      newGrid[row][column] = newNode;
+    }
+
+    console.log(previousNode);
 
     return newGrid;
   };
@@ -208,6 +227,7 @@ const Board = () => {
     if (!pressed && !isFinishNodePressed && !pressedNode) return;
 
     if (pressed) {
+      setBackaTwo([prevCoordinates[0], prevCoordinates[1]]);
       setPrevCoordinates([row, column]);
       const newGrid = setNewStartNode(grid, row, column);
       setGrid(newGrid);
@@ -230,7 +250,6 @@ const Board = () => {
 
   return (
     <div className='container'>
-      {/* <button onClick={() => testHandleClick()}>Click here</button> */}
       <table className={styles.grid}>
         <tbody>
           {grid.map((row, rowIdx) => {
