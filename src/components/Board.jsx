@@ -14,7 +14,7 @@ const Board = () => {
   const initialStartRow = Math.floor(calculatedRows / 2);
   const initialStartColumn = Math.floor(calculatedColumns / 4);
 
-  // Initial finish node coordinates
+  // Initial target node coordinates
   const initialTargetRow = Math.floor(calculatedRows / 2);
   const initialTargetColumn = Math.floor((3 * calculatedColumns) / 4);
 
