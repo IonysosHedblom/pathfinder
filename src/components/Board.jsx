@@ -15,8 +15,8 @@ const Board = () => {
   const initialStartColumn = Math.floor(calculatedColumns / 4);
 
   // Initial finish node coordinates
-  const initialFinishRow = Math.floor(calculatedRows / 2);
-  const initialFinishColumn = Math.floor((3 * calculatedColumns) / 4);
+  const initialTargetRow = Math.floor(calculatedRows / 2);
+  const initialTargetColumn = Math.floor((3 * calculatedColumns) / 4);
 
   // Creates initial nodes for the grid once the component mounts
   const createNode = (row, column) => {
@@ -26,8 +26,8 @@ const Board = () => {
       status:
         row === initialStartRow && column === initialStartColumn
           ? 'start'
-          : row === initialFinishRow && column === initialFinishColumn
-          ? 'finish'
+          : row === initialTargetRow && column === initialTargetColumn
+          ? 'target'
           : '',
       isVisited: false,
       isWall: false,
@@ -55,8 +55,8 @@ const Board = () => {
   // State of when the startNode is pressed
   const [pressed, setPressed] = useState(false);
 
-  // State of when the finishNode is pressed
-  const [isFinishNodePressed, setIsFinishNodePressed] = useState(false);
+  // State of when the targetNode is pressed
+  const [isTargetNodePressed, setIsTargetNodePressed] = useState(false);
 
   // State of when an empty / wall node is pressed
   const [pressedNode, setPressedNode] = useState(false);
@@ -68,9 +68,9 @@ const Board = () => {
     initialStartColumn,
   ]);
 
-  const [prevFinishCoordinates, setPrevFinishCoordinates] = useState([
-    initialFinishRow,
-    initialFinishColumn,
+  const [prevTargetCoordinates, setPrevTargetCoordinates] = useState([
+    initialTargetRow,
+    initialTargetColumn,
   ]);
 
   const [nodeTwoStepsBack, setNodeTwoStepsBack] = useState([
@@ -89,7 +89,7 @@ const Board = () => {
     const previousNode = grid[prevCoordinates[0]][prevCoordinates[1]];
     const twoStepsBack = grid[nodeTwoStepsBack[0]][nodeTwoStepsBack[1]];
 
-    if (twoStepsBack.status === 'start' && previousNode.status === 'finish') {
+    if (twoStepsBack.status === 'start' && previousNode.status === 'target') {
       let newNode = {
         ...twoStepsBack,
         status: '',
@@ -143,27 +143,27 @@ const Board = () => {
     }
   };
 
-  const setNewFinishNode = (grid, row, column) => {
+  const setNewTargetNode = (grid, row, column) => {
     const newGrid = grid.slice();
     const currentNode = grid[row][column];
     let newNode;
     let newPreviousNode;
-    let previousNode = grid[prevFinishCoordinates[0]][prevFinishCoordinates[1]];
+    let previousNode = grid[prevTargetCoordinates[0]][prevTargetCoordinates[1]];
 
     if (previousNode.status !== 'start' && previousNode.status !== 'wall') {
       newPreviousNode = {
         ...previousNode,
         status: '',
       };
-      newGrid[prevFinishCoordinates[0]][
-        prevFinishCoordinates[1]
+      newGrid[prevTargetCoordinates[0]][
+        prevTargetCoordinates[1]
       ] = newPreviousNode;
     }
 
     if (currentNode.status !== 'start' && currentNode.status !== 'wall') {
       newNode = {
         ...currentNode,
-        status: 'finish',
+        status: 'target',
       };
       newGrid[row][column] = newNode;
     }
@@ -171,9 +171,9 @@ const Board = () => {
     return newGrid;
   };
 
-  const getFinishNode = (grid, row, column) => {
+  const getTargetNode = (grid, row, column) => {
     const node = grid[row][column];
-    if (node.status === 'finish') {
+    if (node.status === 'target') {
       return node;
     } else {
       return false;
@@ -184,7 +184,7 @@ const Board = () => {
   const buildWalls = (grid, row, column) => {
     const newGrid = grid.slice();
     const node = grid[row][column];
-    if (node.status !== 'start' && node.status !== 'finish') {
+    if (node.status !== 'start' && node.status !== 'target') {
       const newNode = {
         ...node,
         status: 'wall',
@@ -219,8 +219,8 @@ const Board = () => {
   const handleMouseDown = (row, column) => {
     if (getStartNode(grid, row, column)) {
       setPressed(true);
-    } else if (getFinishNode(grid, row, column)) {
-      setIsFinishNodePressed(true);
+    } else if (getTargetNode(grid, row, column)) {
+      setIsTargetNodePressed(true);
     } else {
       setPressedNode(true);
       if (grid[row][column].status === 'wall') {
@@ -234,20 +234,20 @@ const Board = () => {
   // Stores old start node coordinates in prevcoordinates state,
   // then runs the function at line 68 to render a new grid with updated start node state
   const handleMouseEnter = (row, column) => {
-    if (!pressed && !isFinishNodePressed && !pressedNode) return;
+    if (!pressed && !isTargetNodePressed && !pressedNode) return;
 
     if (pressed) {
       setNodeTwoStepsBack([prevCoordinates[0], prevCoordinates[1]]);
 
       setPrevCoordinates([row, column]);
 
-      if (grid[row][column].status !== 'finish') {
+      if (grid[row][column].status !== 'target') {
         const newGrid = setNewStartNode(grid, row, column);
         setGrid(newGrid);
       }
-    } else if (isFinishNodePressed) {
-      setPrevFinishCoordinates([row, column]);
-      const newGrid = setNewFinishNode(grid, row, column);
+    } else if (isTargetNodePressed) {
+      setPrevTargetCoordinates([row, column]);
+      const newGrid = setNewTargetNode(grid, row, column);
       setGrid(newGrid);
     } else if (pressedNode) {
       const newGrid = buildWalls(grid, row, column);
@@ -259,7 +259,7 @@ const Board = () => {
   const handleMouseUp = () => {
     setPressedNode(false);
     setPressed(false);
-    setIsFinishNodePressed(false);
+    setIsTargetNodePressed(false);
   };
 
   return (
@@ -280,7 +280,7 @@ const Board = () => {
                       status={status}
                       pressed={pressed}
                       isWall={isWall}
-                      isFinishNodePressed={isFinishNodePressed}
+                      isTargetNodePressed={isTargetNodePressed}
                       pressedNode={pressedNode}
                       onMouseDown={(row, column) =>
                         handleMouseDown(row, column)

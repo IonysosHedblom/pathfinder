@@ -33,7 +33,7 @@
   animation-play-state: running;
 }
 
-.finish {
+.target {
   background-image: url(../images/svg/finishnode.svg);
   background-repeat: no-repeat;
   background-position: center;

@@ -8,8 +8,8 @@ const Node = props => {
   const typeOfNode =
     status === 'start'
       ? 'start'
-      : status === 'finish'
-      ? 'finish'
+      : status === 'target'
+      ? 'target'
       : status === 'wall'
       ? 'wall'
       : '';
