@@ -7,18 +7,19 @@ const Board = () => {
   const height = document.documentElement.clientHeight;
   const width = document.documentElement.clientWidth;
 
+  // Calculates how many rows and columns the grid should contain, x or y / 30 where 30 is the pixel size of each node
   let calculatedRows = Math.floor(height / 30) - 6;
   let calculatedColumns = Math.floor(width / 30);
 
-  // Initial start node coordinates
+  // Initial start node coordinates - sets the start row to be in the middle and the column to be on the left side
   const initialStartRow = Math.floor(calculatedRows / 2);
   const initialStartColumn = Math.floor(calculatedColumns / 4);
 
-  // Initial target node coordinates
+  // Initial target node coordinates - sets the target row to be in the middle and the column to be on the right side
   const initialTargetRow = Math.floor(calculatedRows / 2);
   const initialTargetColumn = Math.floor((3 * calculatedColumns) / 4);
 
-  // Creates initial nodes for the grid once the component mounts
+  // Creates initial nodes for the grid state
   const createNode = (row, column) => {
     return {
       row,
@@ -35,7 +36,7 @@ const Board = () => {
     };
   };
 
-  // Creates the grid
+  // Creates the initial grid to use in state
   const createInitialGrid = () => {
     const grid = [];
     for (let row = 0; row < calculatedRows; row++) {
@@ -48,7 +49,7 @@ const Board = () => {
     return grid;
   };
 
-  // Grid is in the state
+  // Stores the grid in state
   const [grid, setGrid] = useState(createInitialGrid);
 
   // State of when the startNode is pressed
@@ -61,33 +62,42 @@ const Board = () => {
   const [pressedNode, setPressedNode] = useState(false);
 
   // Keeps track of the previous coordinates of the start node
-  // so the previous start nodes can be re-rendered into normal or wall nodes
+  // so the previous start nodes can be re-rendered into normal or wall nodes - otherwise it leaves a trail with start nodes
   const [prevCoordinates, setPrevCoordinates] = useState([
     initialStartRow,
     initialStartColumn,
   ]);
 
+  // Keeps track of the previous coordinates of the target node
+  // so the previous target nodes can be re-rendered into normal or wall nodes - otherwise it leaves a trail with target nodes
   const [prevTargetCoordinates, setPrevTargetCoordinates] = useState([
     initialTargetRow,
     initialTargetColumn,
   ]);
 
+  // Keeps track of the status of the node two steps back from the start node (in this case)
+  // - this is made so that the start node never has the same position as the target node, instead it skips it to the next node.
   const [nodeTwoStepsBack, setNodeTwoStepsBack] = useState([
     prevCoordinates[0],
     prevCoordinates[1],
   ]);
 
+  // Keeps track of the status of the node two steps back from the target node (in this case)
+  // - this is made so that the target node never has the same position as the start node, instead it skips it to the next node.
   const [targetTwoStepsBack, setTargetTwoStepsBack] = useState([
     prevTargetCoordinates[0],
     prevTargetCoordinates[1],
   ]);
 
+  // Checks whether the start/target node is currently on a wall node - if it is, the wall node is temporarily replaces with the
+  // start/target node. Once the start/target node leaves the wall node, it is re-rendered into a wall node again.
   const [isOnWallNode, setIsOnWallNode] = useState(false);
 
+  // Function to move the start node on mouse enter.
   // Replaces old start node with a normal node,
-  // then adds the new start node
+  // then adds the new start node to the current position in the grid
   // Returns a new grid with updated start node
-  const setNewStartNode = (grid, row, column) => {
+  const moveStartNode = (grid, row, column) => {
     const newGrid = grid.slice();
     const currentNode = grid[row][column];
     const previousNode = grid[prevCoordinates[0]][prevCoordinates[1]];
@@ -147,7 +157,11 @@ const Board = () => {
     }
   };
 
-  const setNewTargetNode = (grid, row, column) => {
+  // Function to move the target node on mouse enter. (same as moveStartNode)
+  // Replaces old target node with a normal node,
+  // then adds the new target node to the current position in the grid
+  // Returns a new grid with updated target node
+  const moveTargetNode = (grid, row, column) => {
     const newGrid = grid.slice();
     const currentNode = grid[row][column];
     const previousNode =
@@ -202,6 +216,7 @@ const Board = () => {
     return newGrid;
   };
 
+  // Checks whether the node at (row, column) is the current target node
   const getTargetNode = (grid, row, column) => {
     const node = grid[row][column];
     if (node.status === 'target') {
@@ -211,7 +226,7 @@ const Board = () => {
     }
   };
 
-  // Build a new grid with walls
+  // Allows to build walls when mouse is held over the nodes
   const buildWalls = (grid, row, column) => {
     const newGrid = grid.slice();
     const node = grid[row][column];
@@ -232,7 +247,7 @@ const Board = () => {
     return newGrid;
   };
 
-  // Runs function above to see if the startnode has been pressed
+  // Runs a function based on which node is pressed
   const handleMouseDown = (row, column) => {
     if (getStartNode(grid, row, column)) {
       setIsStartNodePressed(true);
@@ -255,7 +270,7 @@ const Board = () => {
       setPrevCoordinates([row, column]);
 
       if (grid[row][column].status !== 'target') {
-        const newGrid = setNewStartNode(grid, row, column);
+        const newGrid = moveStartNode(grid, row, column);
         setGrid(newGrid);
       }
     } else if (isTargetNodePressed) {
@@ -266,7 +281,7 @@ const Board = () => {
       setPrevTargetCoordinates([row, column]);
 
       if (grid[row][column].status !== 'start') {
-        const newGrid = setNewTargetNode(grid, row, column);
+        const newGrid = moveTargetNode(grid, row, column);
         setGrid(newGrid);
       }
     } else if (pressedNode) {
@@ -275,7 +290,7 @@ const Board = () => {
     }
   };
 
-  // No longer clicking, stop moving start node
+  // No longer clicking, stop moving start/target node or stop building walls
   const handleMouseUp = () => {
     setPressedNode(false);
     setIsStartNodePressed(false);
