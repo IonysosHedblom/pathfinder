@@ -6,10 +6,10 @@
 }
 
 .wall {
-  background-color: #2b3661;
+  /* background-color: #2b3661; */
   border: none;
   animation-name: wallAnimation;
-  animation-duration: 0.3s;
+  animation-duration: 0.4s;
   animation-timing-function: ease-out;
   animation-delay: 0;
   animation-direction: alternate;
@@ -48,14 +48,46 @@
   animation-play-state: running;
 }
 
-@keyframes specialNodes {
+.visited {
+  animation-name: visitedAnimation;
+  animation-duration: 1.5s;
+  animation-timing-function: ease-out;
+  animation-delay: 0;
+  animation-direction: alternate;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+  animation-play-state: running;
+}
+
+@keyframes visitedAnimation {
   0% {
     transform: scale(0.3);
-    /*background-color: darkslategrey;*/
+    background-color: #0078e1;
+    border-radius: 100%;
   }
 
   50% {
-    transform: scale(1.1);
+    background-color: #00eeff;
+  }
+
+  75% {
+    transform: scale(1.2);
+    background-color: #00437d;
+  }
+
+  100% {
+    transform: scale(1);
+    background-color: #515680;
+  }
+}
+
+@keyframes specialNodes {
+  0% {
+    transform: scale(0.3);
+  }
+
+  50% {
+    transform: scale(1);
     /*background-color: darkslategrey;*/
   }
 
@@ -68,17 +100,17 @@
 @keyframes wallAnimation {
   0% {
     transform: scale(0.3);
-    background-color: rgb(12, 53, 71);
+    background-color: #77c0ff;
   }
 
   50% {
     transform: scale(1.2);
-    background-color: rgb(12, 53, 71);
+    background-color: #77c0ff;
   }
 
   100% {
     transform: scale(1);
-    background-color: rgb(12, 53, 71);
+    background-color: #77c0ff;
   }
 }
 

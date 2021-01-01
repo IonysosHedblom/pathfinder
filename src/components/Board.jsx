@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import Node from './Node';
 import styles from '../assets/styles/Board.css';
 
+// Dijkstras
+import { dijkstra, getNodesInShortestPath } from '../algorithms/dijkstra';
+
 const Board = () => {
   // Calculates number of rows and columns based on window height
   const height = document.documentElement.clientHeight;
@@ -66,6 +69,18 @@ const Board = () => {
   const [prevCoordinates, setPrevCoordinates] = useState([
     initialStartRow,
     initialStartColumn,
+  ]);
+
+  // Stores the coordinates of the start node
+  const [currentStartCoordinates, setCurrentStartCoordinates] = useState([
+    initialStartRow,
+    initialStartColumn,
+  ]);
+
+  // Stores coordinates of target node
+  const [currentTargetCoordinates, setCurrentTargetCoordinates] = useState([
+    initialTargetRow,
+    initialTargetColumn,
   ]);
 
   // Keeps track of the previous coordinates of the target node
@@ -259,8 +274,7 @@ const Board = () => {
     }
   };
 
-  // Stores old start node coordinates in prevcoordinates state,
-  // then runs the function at line 68 to render a new grid with updated start node state
+  // Checks which node is pressed, and runs a function accordingly. Stops running when the node is released (onmouseup).
   const handleMouseEnter = (row, column) => {
     if (!isStartNodePressed && !isTargetNodePressed && !pressedNode) return;
 
@@ -273,6 +287,7 @@ const Board = () => {
         const newGrid = moveStartNode(grid, row, column);
         setGrid(newGrid);
       }
+      setCurrentStartCoordinates([row, column]);
     } else if (isTargetNodePressed) {
       setTargetTwoStepsBack([
         prevTargetCoordinates[0],
@@ -284,6 +299,7 @@ const Board = () => {
         const newGrid = moveTargetNode(grid, row, column);
         setGrid(newGrid);
       }
+      setCurrentTargetCoordinates([row, column]);
     } else if (pressedNode) {
       const newGrid = buildWalls(grid, row, column);
       setGrid(newGrid);
@@ -297,15 +313,56 @@ const Board = () => {
     setIsTargetNodePressed(false);
   };
 
+  // Animates Dijkstras algorithm
+  const animateDijkstras = (visitedNodesInOrder, nodesInShortestPath) => {
+    for (let i = 0; i < visitedNodesInOrder.length; i++) {
+      if (i === visitedNodesInOrder.length) {
+        setTimeout(() => {
+          animateShortestPath(nodesInShortestPath);
+        }, 10 * i);
+        return;
+      }
+      setTimeout(() => {
+        const node = visitedNodesInOrder[i];
+        document.getElementById(`${node.row}-${node.column}`).className =
+          'node visited';
+      }, 50 * i);
+    }
+  };
+
+  // Visualizes Dijkstras algorithm
+  const visualizeDijkstras = () => {
+    const startNode =
+      grid[currentStartCoordinates[0]][currentStartCoordinates[1]];
+    const targetNode =
+      grid[currentTargetCoordinates[0]][currentTargetCoordinates[1]];
+    const visitedNodesInOrder = dijkstra(grid, startNode, targetNode);
+    const nodesInShortestPath = getNodesInShortestPath(targetNode);
+    animateDijkstras(visitedNodesInOrder, nodesInShortestPath);
+  };
+
+  const animateShortestPath = nodesInShortestPath => {
+    for (let i = 0; i < nodesInShortestPath.length; i++) {
+      setTimeout(() => {
+        const node = nodesInShortestPath[i];
+        document.getElementById(`${node.row}-${node.column}`).className =
+          'node node-shortest-path';
+      }, 50 * i);
+    }
+  };
+
   return (
     <div className='container'>
+      <button onClick={() => visualizeDijkstras(grid)}>
+        Visualize Dijkstra
+      </button>
       <table className={styles.grid}>
         <tbody>
           {grid.map((row, rowIdx) => {
             return (
               <tr key={rowIdx}>
                 {row.map((node, nodeIdx) => {
-                  const { row, column, status } = node;
+                  const { row, column, status, isVisited } = node;
 
                   return (
                     <Node
@@ -313,6 +370,7 @@ const Board = () => {
                       row={row}
                       column={column}
                       status={status}
+                      isVisited={isVisited}
                       isStartNodePressed={isStartNodePressed}
                       isTargetNodePressed={isTargetNodePressed}
                       pressedNode={pressedNode}
