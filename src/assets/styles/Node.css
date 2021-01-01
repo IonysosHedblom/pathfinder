@@ -59,27 +59,84 @@
   animation-play-state: running;
 }
 
-@keyframes visitedAnimation {
+.node-shortest-path {
+  animation-name: shortestPath;
+  animation-duration: 0.7s;
+  animation-timing-function: ease-out;
+  animation-delay: 0;
+  animation-direction: alternate;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+  animation-play-state: running;
+}
+
+/* Old school computer animation */
+/* @keyframes visitedAnimation {
   0% {
     transform: scale(0.3);
-    background-color: #0078e1;
+    background-color: #292e49;
     border-radius: 100%;
   }
 
   50% {
-    background-color: #00eeff;
+    background-color: #536976;
   }
 
   75% {
     transform: scale(1.2);
-    background-color: #00437d;
+    background-color: #889fac;
   }
 
   100% {
     transform: scale(1);
-    background-color: #515680;
+    background-color: #bbd2c5;
+  }
+} */
+/* Preferred atm */
+@keyframes visitedAnimation {
+  0% {
+    transform: scale(0.3);
+    background-color: #283048;
+    border-radius: 100%;
+  }
+
+  50% {
+    background-color: #3b466a;
+  }
+
+  75% {
+    transform: scale(1.2);
+    background-color: #6e7ba7;
+  }
+
+  100% {
+    transform: scale(1);
+    background-color: #6980c9;
   }
 }
+
+/* COLD ANIMATION  */
+/* @keyframes visitedAnimation {
+  0% {
+    transform: scale(0.3);
+    background-color: #2a5174;
+    border-radius: 100%;
+  }
+
+  50% {
+    background-color: #356894;
+  }
+
+  75% {
+    transform: scale(1.2);
+    background-color: #468ac6;
+  }
+
+  100% {
+    transform: scale(1);
+    background-color: #54a1e4;
+  }
+} */
 
 @keyframes specialNodes {
   0% {
@@ -100,17 +157,36 @@
 @keyframes wallAnimation {
   0% {
     transform: scale(0.3);
-    background-color: #77c0ff;
+    background-color: #5569b6;
   }
 
   50% {
     transform: scale(1.2);
-    background-color: #77c0ff;
+    background-color: #3a477b;
   }
 
   100% {
     transform: scale(1);
-    background-color: #77c0ff;
+    background-color: #222b4d;
+  }
+}
+
+@keyframes shortestPath {
+  0% {
+    transform: scale(0.8);
+    background-color: #60da8d;
+  }
+
+  50% {
+    transform: scale(0.9);
+
+    background-color: #60da8d;
+  }
+
+  100% {
+    transform: scale(1);
+
+    background-color: #60da8d;
   }
 }
 

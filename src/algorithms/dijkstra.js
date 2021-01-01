@@ -3,6 +3,7 @@ export const dijkstra = (grid, start, target) => {
   const visitedNodesInOrder = [];
   start.distance = 0;
   const unvisitedNodes = getAllNodes(grid);
+
   while (!!unvisitedNodes.length) {
     sortNodesByDistance(unvisitedNodes);
     const closestNode = unvisitedNodes.shift();
@@ -40,6 +41,7 @@ const getUnvisitedNeighbors = (node, grid) => {
   if (row < grid.length - 1) neighbors.push(grid[row + 1][column]);
   if (column > 0) neighbors.push(grid[row][column - 1]);
   if (column < grid[0].length - 1) neighbors.push(grid[row][column + 1]);
+
   return neighbors.filter(neighbor => !neighbor.isVisited);
 };
 

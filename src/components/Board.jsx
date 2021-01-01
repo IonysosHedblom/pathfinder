@@ -315,7 +315,7 @@ const Board = () => {
 
   // Animates Dijkstras algorithm
   const animateDijkstras = (visitedNodesInOrder, nodesInShortestPath) => {
-    for (let i = 0; i < visitedNodesInOrder.length; i++) {
+    for (let i = 0; i <= visitedNodesInOrder.length; i++) {
       if (i === visitedNodesInOrder.length) {
         setTimeout(() => {
           animateShortestPath(nodesInShortestPath);
@@ -324,9 +324,14 @@ const Board = () => {
       }
       setTimeout(() => {
         const node = visitedNodesInOrder[i];
-        document.getElementById(`${node.row}-${node.column}`).className =
-          'node visited';
-      }, 50 * i);
+        if (node.status === 'start') {
+          document.getElementById(`${node.row}-${node.column}`).className =
+            'node start visited';
+        } else {
+          document.getElementById(`${node.row}-${node.column}`).className =
+            'node visited';
+        }
+      }, 8 * i);
     }
   };
 
@@ -345,8 +350,16 @@ const Board = () => {
     for (let i = 0; i < nodesInShortestPath.length; i++) {
       setTimeout(() => {
         const node = nodesInShortestPath[i];
+        const previousNode = nodesInShortestPath[i - 1];
+
+        if (previousNode) {
+          document
+            .getElementById(`${previousNode.row}-${previousNode.column}`)
+            .classList.remove('start');
+        }
+
         document.getElementById(`${node.row}-${node.column}`).className =
-          'node node-shortest-path';
+          'node node-shortest-path start';
       }, 50 * i);
     }
   };
