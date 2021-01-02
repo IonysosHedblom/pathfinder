@@ -36,6 +36,7 @@ const Board = () => {
       isVisited: false,
       distance: Infinity,
       previousNode: null,
+      shortest: false,
     };
   };
 
@@ -107,6 +108,10 @@ const Board = () => {
   // Checks whether the start/target node is currently on a wall node - if it is, the wall node is temporarily replaces with the
   // start/target node. Once the start/target node leaves the wall node, it is re-rendered into a wall node again.
   const [isOnWallNode, setIsOnWallNode] = useState(false);
+
+  const [isInitialStart, setIsInitialStart] = useState(true);
+
+  const [algoDone, setAlgoDone] = useState(false);
 
   // Function to move the start node on mouse enter.
   // Replaces old start node with a normal node,
@@ -316,20 +321,31 @@ const Board = () => {
   // Animates Dijkstras algorithm
   const animateDijkstras = (visitedNodesInOrder, nodesInShortestPath) => {
     for (let i = 0; i <= visitedNodesInOrder.length; i++) {
+      // if (i === visitedNodesInOrder.length) {
+      //   // setTimeout(() => {
+      //   //   animateShortestPath(nodesInShortestPath);
+      //   // }, 10 * i);
+
+      //   const newGrid = animateShortestPath2(grid, nodesInShortestPath);
+
+      //   setGrid(newGrid);
+
+      //   return;
+      // }
       if (i === visitedNodesInOrder.length) {
-        setTimeout(() => {
-          animateShortestPath(nodesInShortestPath);
-        }, 10 * i);
-        return;
+        setAlgoDone(true);
       }
       setTimeout(() => {
         const node = visitedNodesInOrder[i];
-        if (node.status === 'start') {
-          document.getElementById(`${node.row}-${node.column}`).className =
-            'node start visited';
-        } else {
-          document.getElementById(`${node.row}-${node.column}`).className =
-            'node visited';
+
+        if (node) {
+          if (node.status === 'start') {
+            document.getElementById(`${node.row}-${node.column}`).className =
+              'node start visited';
+          } else {
+            document.getElementById(`${node.row}-${node.column}`).className =
+              'node visited';
+          }
         }
       }, 8 * i);
     }
@@ -344,23 +360,62 @@ const Board = () => {
     const visitedNodesInOrder = dijkstra(grid, startNode, targetNode);
     const nodesInShortestPath = getNodesInShortestPath(targetNode);
     animateDijkstras(visitedNodesInOrder, nodesInShortestPath);
+    console.log(algoDone);
+    // if (algoDone) {
+    //   animateShortestPath2(grid, nodesInShortestPath);
+    // }
   };
 
-  const animateShortestPath = nodesInShortestPath => {
+  // const animateShortestPath = nodesInShortestPath => {
+  //   for (let i = 0; i < nodesInShortestPath.length; i++) {
+  //     setTimeout(() => {
+  //       const node = nodesInShortestPath[i];
+  //       const previousNode = nodesInShortestPath[i - 1];
+  //       console.log(node);
+
+  //       if (previousNode && previousNode.status !== 'start') {
+  //         document
+  //           .getElementById(`${previousNode.row}-${previousNode.column}`)
+  //           .classList.remove('start');
+  //       }
+
+  //       document.getElementById(`${node.row}-${node.column}`).className =
+  //         'node node-shortest-path start';
+  //     }, 50 * i);
+  //   }
+  // };
+
+  // Draw nodes in shortest path in new grid test
+  const animateShortestPath2 = (grid, nodesInShortestPath) => {
+    const newGrid = grid.slice();
     for (let i = 0; i < nodesInShortestPath.length; i++) {
-      setTimeout(() => {
-        const node = nodesInShortestPath[i];
-        const previousNode = nodesInShortestPath[i - 1];
+      const currentNode = nodesInShortestPath[i];
+      const previousNode = nodesInShortestPath[i - 1];
 
-        if (previousNode) {
-          document
-            .getElementById(`${previousNode.row}-${previousNode.column}`)
-            .classList.remove('start');
-        }
+      if (nodesInShortestPath[i] === nodesInShortestPath[1]) {
+        setIsInitialStart(false);
+      }
+      let newNode = {
+        ...currentNode,
+        status: 'start',
+        shortest: true,
+      };
 
-        document.getElementById(`${node.row}-${node.column}`).className =
-          'node node-shortest-path start';
-      }, 50 * i);
+      if (
+        previousNode &&
+        previousNode.status === 'start' &&
+        isInitialStart === false
+      ) {
+        let newPreviousNode = {
+          ...previousNode,
+          status: '',
+          shortest: true,
+        };
+        newGrid[previousNode.row][previousNode.column] = newPreviousNode;
+      }
+
+      newGrid[currentNode.row][currentNode.column] = newNode;
+      setGrid(newGrid);
     }
   };
 
@@ -375,11 +430,12 @@ const Board = () => {
             return (
               <tr key={rowIdx}>
                 {row.map((node, nodeIdx) => {
-                  const { row, column, status, isVisited } = node;
+                  const { row, column, status, isVisited, shortest } = node;
 
                   return (
                     <Node
                       key={nodeIdx}
+                      shortest={shortest}
                       row={row}
                       column={column}
                       status={status}
