@@ -350,7 +350,7 @@ const Board = () => {
       if (i === visitedNodesInOrder.length) {
         setTimeout(() => {
           animateShortestPath(nodesInShortestPath);
-        }, 10 * i);
+        }, 20 * i);
       }
       setTimeout(() => {
         const node = visitedNodesInOrder[i];
@@ -363,7 +363,7 @@ const Board = () => {
               'node visited';
           }
         }
-      }, 10 * i);
+      }, 20 * i);
     }
   };
 
