@@ -54,11 +54,11 @@ const updateUnvisitedNeighbors = (node, grid) => {
 };
 
 export const getNodesInShortestPath = target => {
-  const nodesInShortesPath = [];
+  const nodesInShortestPath = [];
   let currentNode = target;
   while (currentNode !== null) {
-    nodesInShortesPath.unshift(currentNode);
+    nodesInShortestPath.unshift(currentNode);
     currentNode = currentNode.previousNode;
   }
-  return nodesInShortesPath;
+  return nodesInShortestPath;
 };

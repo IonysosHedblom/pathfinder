@@ -124,6 +124,7 @@ const Board = () => {
 
     if (algoDone) {
       removePattern(grid);
+      resetGrid();
     }
 
     if (twoStepsBack.status === 'start' && previousNode.status === 'target') {
@@ -139,6 +140,9 @@ const Board = () => {
       let newNode = {
         ...currentNode,
         status: 'start',
+        distance: Infinity,
+        isVisited: false,
+        shortest: false,
       };
 
       newGrid[row][column] = newNode;
@@ -155,6 +159,7 @@ const Board = () => {
     if (previousNode.status === 'start' && !isOnWallNode) {
       let newPreviousNode = {
         ...previousNode,
+        isVisited: false,
         status: '',
       };
       newGrid[prevCoordinates[0]][prevCoordinates[1]] = newPreviousNode;
@@ -166,8 +171,6 @@ const Board = () => {
 
       newGrid[prevCoordinates[0]][prevCoordinates[1]] = newPreviousNode;
     }
-
-    setCurrentStartCoordinates([currentNode.row, currentNode.column]);
 
     return newGrid;
   };
@@ -192,6 +195,11 @@ const Board = () => {
     const previousNode =
       grid[prevTargetCoordinates[0]][prevTargetCoordinates[1]];
     const twoStepsBack = grid[targetTwoStepsBack[0]][targetTwoStepsBack[1]];
+
+    if (algoDone) {
+      removePattern(grid);
+      resetGrid();
+    }
 
     if (twoStepsBack.status === 'target' && previousNode.status === 'start') {
       let newNode = {
@@ -237,8 +245,6 @@ const Board = () => {
         prevTargetCoordinates[1]
       ] = newPreviousNode;
     }
-
-    setCurrentTargetCoordinates([currentNode.row, currentNode.column]);
 
     return newGrid;
   };
@@ -294,10 +300,7 @@ const Board = () => {
       setNodeTwoStepsBack([prevCoordinates[0], prevCoordinates[1]]);
 
       setPrevCoordinates([row, column]);
-      if (algoDone) {
-        removePattern(grid);
-      }
-
+      setCurrentStartCoordinates([row, column]);
       if (grid[row][column].status !== 'target') {
         const newGrid = moveStartNode(grid, row, column);
         setGrid(newGrid);
@@ -320,15 +323,27 @@ const Board = () => {
   };
 
   // No longer clicking, stop moving start/target node or stop building walls
-  const handleMouseUp = (row, column) => {
+  const handleMouseUp = () => {
     setPressedNode(false);
     setIsStartNodePressed(false);
     setIsTargetNodePressed(false);
-    if (getStartNode(grid, row, column)) {
-      setAlgoDone(false);
-    }
+    // setAlgoDone(false);
   };
 
+  // Visualizes Dijkstras algorithm
+  const visualizeDijkstras = () => {
+    removePattern(grid);
+    resetGrid();
+    const start = grid[currentStartCoordinates[0]][currentStartCoordinates[1]];
+    const target =
+      grid[currentTargetCoordinates[0]][currentTargetCoordinates[1]];
+
+    const visitedNodesInOrder = dijkstra(grid, start, target);
+
+    const nodesInShortestPath = getNodesInShortestPath(target);
+
+    animateDijkstras(visitedNodesInOrder, nodesInShortestPath);
+  };
   // Animates Dijkstras algorithm
   const animateDijkstras = (visitedNodesInOrder, nodesInShortestPath) => {
     for (let i = 0; i <= visitedNodesInOrder.length; i++) {
@@ -348,22 +363,8 @@ const Board = () => {
               'node visited';
           }
         }
-      }, 8 * i);
+      }, 10 * i);
     }
-  };
-
-  // Visualizes Dijkstras algorithm
-  const visualizeDijkstras = () => {
-    const startNode =
-      grid[currentStartCoordinates[0]][currentStartCoordinates[1]];
-    const targetNode =
-      grid[currentTargetCoordinates[0]][currentTargetCoordinates[1]];
-
-    const visitedNodesInOrder = dijkstra(grid, startNode, targetNode);
-
-    const nodesInShortestPath = getNodesInShortestPath(targetNode);
-
-    animateDijkstras(visitedNodesInOrder, nodesInShortestPath);
   };
 
   const animateShortestPath = nodesInShortestPath => {
@@ -424,6 +425,26 @@ const Board = () => {
         }
       });
     });
+    setAlgoDone(false);
+  };
+
+  const resetGrid = () => {
+    const newGrid = grid.slice();
+
+    grid.forEach(row => {
+      row.forEach(node => {
+        let newNode = {
+          ...node,
+          isVisited: false,
+          shortest: false,
+          distance: Infinity,
+          previousNode: null,
+        };
+        newGrid[node.row][node.column] = newNode;
+      });
+    });
+
+    setGrid(newGrid);
   };
 
   // const resetBoard = () => {
@@ -445,7 +466,8 @@ const Board = () => {
   //   });
   //   setGrid(newGrid);
   //   setAlgoDone(false);
-  // };
+  // }
+  // console.log(grid);
 
   return (
     <div className='container'>
