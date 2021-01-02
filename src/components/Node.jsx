@@ -10,7 +10,6 @@ const Node = props => {
     onMouseDown,
     onMouseEnter,
     onMouseUp,
-    isVisited,
     shortest,
   } = props;
 
@@ -29,7 +28,7 @@ const Node = props => {
     <td
       onMouseDown={() => onMouseDown(row, column)}
       onMouseEnter={() => onMouseEnter(row, column)}
-      onMouseUp={() => onMouseUp()}
+      onMouseUp={() => onMouseUp(row, column)}
       className={`node ${typeOfNode} ${shortestClass}`}
       id={`${row}-${column}`}
     ></td>

@@ -109,8 +109,7 @@ const Board = () => {
   // start/target node. Once the start/target node leaves the wall node, it is re-rendered into a wall node again.
   const [isOnWallNode, setIsOnWallNode] = useState(false);
 
-  const [isInitialStart, setIsInitialStart] = useState(true);
-
+  // Checks if the algorithm animation is done
   const [algoDone, setAlgoDone] = useState(false);
 
   // Function to move the start node on mouse enter.
@@ -122,6 +121,10 @@ const Board = () => {
     const currentNode = grid[row][column];
     const previousNode = grid[prevCoordinates[0]][prevCoordinates[1]];
     const twoStepsBack = grid[nodeTwoStepsBack[0]][nodeTwoStepsBack[1]];
+
+    if (algoDone) {
+      removePattern(grid);
+    }
 
     if (twoStepsBack.status === 'start' && previousNode.status === 'target') {
       let newNode = {
@@ -163,6 +166,8 @@ const Board = () => {
 
       newGrid[prevCoordinates[0]][prevCoordinates[1]] = newPreviousNode;
     }
+
+    setCurrentStartCoordinates([currentNode.row, currentNode.column]);
 
     return newGrid;
   };
@@ -233,6 +238,8 @@ const Board = () => {
       ] = newPreviousNode;
     }
 
+    setCurrentTargetCoordinates([currentNode.row, currentNode.column]);
+
     return newGrid;
   };
 
@@ -287,24 +294,25 @@ const Board = () => {
       setNodeTwoStepsBack([prevCoordinates[0], prevCoordinates[1]]);
 
       setPrevCoordinates([row, column]);
+      if (algoDone) {
+        removePattern(grid);
+      }
 
       if (grid[row][column].status !== 'target') {
         const newGrid = moveStartNode(grid, row, column);
         setGrid(newGrid);
       }
-      setCurrentStartCoordinates([row, column]);
     } else if (isTargetNodePressed) {
       setTargetTwoStepsBack([
         prevTargetCoordinates[0],
         prevTargetCoordinates[1],
       ]);
       setPrevTargetCoordinates([row, column]);
-
+      setCurrentTargetCoordinates([row, column]);
       if (grid[row][column].status !== 'start') {
         const newGrid = moveTargetNode(grid, row, column);
         setGrid(newGrid);
       }
-      setCurrentTargetCoordinates([row, column]);
     } else if (pressedNode) {
       const newGrid = buildWalls(grid, row, column);
       setGrid(newGrid);
@@ -312,32 +320,25 @@ const Board = () => {
   };
 
   // No longer clicking, stop moving start/target node or stop building walls
-  const handleMouseUp = () => {
+  const handleMouseUp = (row, column) => {
     setPressedNode(false);
     setIsStartNodePressed(false);
     setIsTargetNodePressed(false);
+    if (getStartNode(grid, row, column)) {
+      setAlgoDone(false);
+    }
   };
 
   // Animates Dijkstras algorithm
   const animateDijkstras = (visitedNodesInOrder, nodesInShortestPath) => {
     for (let i = 0; i <= visitedNodesInOrder.length; i++) {
-      // if (i === visitedNodesInOrder.length) {
-      //   // setTimeout(() => {
-      //   //   animateShortestPath(nodesInShortestPath);
-      //   // }, 10 * i);
-
-      //   const newGrid = animateShortestPath2(grid, nodesInShortestPath);
-
-      //   setGrid(newGrid);
-
-      //   return;
-      // }
       if (i === visitedNodesInOrder.length) {
-        setAlgoDone(true);
+        setTimeout(() => {
+          animateShortestPath(nodesInShortestPath);
+        }, 10 * i);
       }
       setTimeout(() => {
         const node = visitedNodesInOrder[i];
-
         if (node) {
           if (node.status === 'start') {
             document.getElementById(`${node.row}-${node.column}`).className =
@@ -357,73 +358,99 @@ const Board = () => {
       grid[currentStartCoordinates[0]][currentStartCoordinates[1]];
     const targetNode =
       grid[currentTargetCoordinates[0]][currentTargetCoordinates[1]];
+
     const visitedNodesInOrder = dijkstra(grid, startNode, targetNode);
+
     const nodesInShortestPath = getNodesInShortestPath(targetNode);
+
     animateDijkstras(visitedNodesInOrder, nodesInShortestPath);
-    console.log(algoDone);
-    // if (algoDone) {
-    //   animateShortestPath2(grid, nodesInShortestPath);
-    // }
   };
 
-  // const animateShortestPath = nodesInShortestPath => {
-  //   for (let i = 0; i < nodesInShortestPath.length; i++) {
-  //     setTimeout(() => {
-  //       const node = nodesInShortestPath[i];
-  //       const previousNode = nodesInShortestPath[i - 1];
-  //       console.log(node);
-
-  //       if (previousNode && previousNode.status !== 'start') {
-  //         document
-  //           .getElementById(`${previousNode.row}-${previousNode.column}`)
-  //           .classList.remove('start');
-  //       }
-
-  //       document.getElementById(`${node.row}-${node.column}`).className =
-  //         'node node-shortest-path start';
-  //     }, 50 * i);
-  //   }
-  // };
-
-  // Draw nodes in shortest path in new grid test
-  const animateShortestPath2 = (grid, nodesInShortestPath) => {
-    const newGrid = grid.slice();
+  const animateShortestPath = nodesInShortestPath => {
     for (let i = 0; i < nodesInShortestPath.length; i++) {
-      const currentNode = nodesInShortestPath[i];
-      const previousNode = nodesInShortestPath[i - 1];
+      setTimeout(() => {
+        const node = nodesInShortestPath[i];
+        const previousNode = nodesInShortestPath[i - 1];
 
-      if (nodesInShortestPath[i] === nodesInShortestPath[1]) {
-        setIsInitialStart(false);
-      }
-      let newNode = {
-        ...currentNode,
-        status: 'start',
-        shortest: true,
-      };
+        if (node.status === 'target') {
+          setAlgoDone(true);
+          document.getElementById(`${node.row}-${node.column}`).className =
+            'node node-shortest-path target start';
+        } else {
+          document.getElementById(`${node.row}-${node.column}`).className =
+            'node node-shortest-path start';
+        }
 
-      if (
-        previousNode &&
-        previousNode.status === 'start' &&
-        isInitialStart === false
-      ) {
-        let newPreviousNode = {
-          ...previousNode,
-          status: '',
-          shortest: true,
-        };
-        newGrid[previousNode.row][previousNode.column] = newPreviousNode;
-      }
-
-      newGrid[currentNode.row][currentNode.column] = newNode;
-      setGrid(newGrid);
+        if (previousNode && previousNode.status !== 'start') {
+          document
+            .getElementById(`${previousNode.row}-${previousNode.column}`)
+            .classList.remove('start');
+        }
+      }, 50 * i);
     }
   };
 
+  const clearWalls = grid => {
+    const newGrid = grid.slice();
+    newGrid.forEach(row => {
+      row.forEach(node => {
+        if (node.status === 'wall') {
+          let newNode = {
+            ...node,
+            status: '',
+          };
+          newGrid[node.row][node.column] = newNode;
+        }
+        if (node.isVisited) {
+          let newNode = {
+            ...node,
+            isVisited: false,
+          };
+          newGrid[node.row][node.column] = newNode;
+        }
+      });
+    });
+    return newGrid;
+  };
+
+  const removePattern = grid => {
+    grid.forEach(row => {
+      row.forEach(node => {
+        const nodeById = document.getElementById(`${node.row}-${node.column}`);
+        nodeById.classList.remove('visited');
+        nodeById.classList.remove('node-shortest-path');
+        if (node.status === 'target') {
+          nodeById.classList.remove('start');
+        }
+      });
+    });
+  };
+
+  // const resetBoard = () => {
+  //   // clearWalls(grid);
+  //   const newGrid = createInitialGrid();
+  //   setCurrentStartCoordinates([initialStartRow, initialStartColumn]);
+  //   setCurrentTargetCoordinates([initialTargetRow, initialTargetColumn]);
+
+  //   newGrid.forEach(row => {
+  //     row.forEach(node => {
+  //       const nodeById = document.getElementById(`${node.row}-${node.column}`);
+
+  //       nodeById.classList.remove('visited');
+  //       nodeById.classList.remove('node-shortest-path');
+  //       if (node.status === 'target') {
+  //         nodeById.classList.remove('start');
+  //       }
+  //     });
+  //   });
+  //   setGrid(newGrid);
+  //   setAlgoDone(false);
+  // };
+
   return (
     <div className='container'>
-      <button onClick={() => visualizeDijkstras(grid)}>
-        Visualize Dijkstra
-      </button>
+      <button onClick={() => removePattern(grid)}>RESET GRID</button>
+      <button onClick={() => visualizeDijkstras()}>Visualize Dijkstra</button>
       <table className={styles.grid}>
         <tbody>
           {grid.map((row, rowIdx) => {
@@ -449,7 +476,7 @@ const Board = () => {
                       onMouseEnter={(row, column) =>
                         handleMouseEnter(row, column)
                       }
-                      onMouseUp={() => handleMouseUp()}
+                      onMouseUp={(row, column) => handleMouseUp(row, column)}
                     ></Node>
                   );
                 })}
