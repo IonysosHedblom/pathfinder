@@ -111,8 +111,56 @@ const Board = () => {
 
   // Checks if the algorithm animation is done
   const [algoDone, setAlgoDone] = useState(false);
+  // Disables functionality while algo is running
   const [disable, setDisable] = useState(false);
 
+  const shortestPath = nodesInShortestPath => {
+    for (let i = 0; i < nodesInShortestPath.length; i++) {
+      const node = nodesInShortestPath[i];
+      const previousNode = nodesInShortestPath[i - 1];
+      if (node.status === 'target') {
+        document.getElementById(`${node.row}-${node.column}`).className =
+          'node node-shortest-path target start';
+      } else {
+        document.getElementById(`${node.row}-${node.column}`).className =
+          'node node-shortest-path start';
+      }
+
+      if (previousNode && previousNode.status !== 'start') {
+        document
+          .getElementById(`${previousNode.row}-${previousNode.column}`)
+          .classList.remove('start');
+      }
+    }
+  };
+
+  const runDijkstra = () => {
+    resetGrid();
+    // removePattern(grid);
+    const visitedNodesInOrder = dijkstra(
+      grid,
+      grid[currentStartCoordinates[0]][currentStartCoordinates[1]],
+      grid[currentTargetCoordinates[0]][currentTargetCoordinates[1]]
+    );
+    const nodesInShortestPath = getNodesInShortestPath(
+      grid[currentTargetCoordinates[0]][currentTargetCoordinates[1]]
+    );
+    for (let i = 0; i <= visitedNodesInOrder.length; i++) {
+      if (i === visitedNodesInOrder.length) {
+        shortestPath(nodesInShortestPath);
+      }
+      const node = visitedNodesInOrder[i];
+      if (node) {
+        if (node.status === 'start') {
+          document.getElementById(`${node.row}-${node.column}`).className =
+            'node start visited';
+        } else {
+          document.getElementById(`${node.row}-${node.column}`).className =
+            'node visited';
+        }
+      }
+    }
+  };
   // Function to move the start node on mouse enter.
   // Replaces old start node with a normal node,
   // then adds the new start node to the current position in the grid
@@ -123,10 +171,11 @@ const Board = () => {
     const previousNode = grid[prevCoordinates[0]][prevCoordinates[1]];
     const twoStepsBack = grid[nodeTwoStepsBack[0]][nodeTwoStepsBack[1]];
 
-    if (algoDone) {
-      removePattern(grid);
-      // resetGrid();
-    }
+    // if (algoDone) {
+    removePattern(grid);
+    // resetGrid();
+    runDijkstra();
+    // }
 
     if (twoStepsBack.status === 'start' && previousNode.status === 'target') {
       let newNode = {
@@ -198,7 +247,7 @@ const Board = () => {
     const twoStepsBack = grid[targetTwoStepsBack[0]][targetTwoStepsBack[1]];
 
     if (algoDone) {
-      removePattern(grid);
+      // removePattern(grid);
       // resetGrid();
     }
 
@@ -283,6 +332,8 @@ const Board = () => {
 
   // Runs a function based on which node is pressed
   const handleMouseDown = (row, column) => {
+    // removePattern(grid);
+    // resetGrid();
     if (getStartNode(grid, row, column) && !disable) {
       setIsStartNodePressed(true);
     } else if (getTargetNode(grid, row, column) && !disable) {
@@ -456,28 +507,6 @@ const Board = () => {
 
     setGrid(newGrid);
   };
-
-  // const resetBoard = () => {
-  //   // clearWalls(grid);
-  //   const newGrid = createInitialGrid();
-  //   setCurrentStartCoordinates([initialStartRow, initialStartColumn]);
-  //   setCurrentTargetCoordinates([initialTargetRow, initialTargetColumn]);
-
-  //   newGrid.forEach(row => {
-  //     row.forEach(node => {
-  //       const nodeById = document.getElementById(`${node.row}-${node.column}`);
-
-  //       nodeById.classList.remove('visited');
-  //       nodeById.classList.remove('node-shortest-path');
-  //       if (node.status === 'target') {
-  //         nodeById.classList.remove('start');
-  //       }
-  //     });
-  //   });
-  //   setGrid(newGrid);
-  //   setAlgoDone(false);
-  // }
-  // console.log(grid);
 
   return (
     <div className='container'>
