@@ -111,6 +111,7 @@ const Board = () => {
 
   // Checks if the algorithm animation is done
   const [algoDone, setAlgoDone] = useState(false);
+  const [disable, setDisable] = useState(false);
 
   // Function to move the start node on mouse enter.
   // Replaces old start node with a normal node,
@@ -124,7 +125,7 @@ const Board = () => {
 
     if (algoDone) {
       removePattern(grid);
-      resetGrid();
+      // resetGrid();
     }
 
     if (twoStepsBack.status === 'start' && previousNode.status === 'target') {
@@ -198,7 +199,7 @@ const Board = () => {
 
     if (algoDone) {
       removePattern(grid);
-      resetGrid();
+      // resetGrid();
     }
 
     if (twoStepsBack.status === 'target' && previousNode.status === 'start') {
@@ -282,11 +283,11 @@ const Board = () => {
 
   // Runs a function based on which node is pressed
   const handleMouseDown = (row, column) => {
-    if (getStartNode(grid, row, column)) {
+    if (getStartNode(grid, row, column) && !disable) {
       setIsStartNodePressed(true);
-    } else if (getTargetNode(grid, row, column)) {
+    } else if (getTargetNode(grid, row, column) && !disable) {
       setIsTargetNodePressed(true);
-    } else {
+    } else if (!disable) {
       setPressedNode(true);
       buildWalls(grid, row, column);
     }
@@ -332,20 +333,24 @@ const Board = () => {
 
   // Visualizes Dijkstras algorithm
   const visualizeDijkstras = () => {
-    removePattern(grid);
-    resetGrid();
-    const start = grid[currentStartCoordinates[0]][currentStartCoordinates[1]];
-    const target =
-      grid[currentTargetCoordinates[0]][currentTargetCoordinates[1]];
+    if (!disable) {
+      removePattern(grid);
+      resetGrid();
+      const start =
+        grid[currentStartCoordinates[0]][currentStartCoordinates[1]];
+      const target =
+        grid[currentTargetCoordinates[0]][currentTargetCoordinates[1]];
 
-    const visitedNodesInOrder = dijkstra(grid, start, target);
+      const visitedNodesInOrder = dijkstra(grid, start, target);
 
-    const nodesInShortestPath = getNodesInShortestPath(target);
+      const nodesInShortestPath = getNodesInShortestPath(target);
 
-    animateDijkstras(visitedNodesInOrder, nodesInShortestPath);
+      animateDijkstras(visitedNodesInOrder, nodesInShortestPath);
+    }
   };
   // Animates Dijkstras algorithm
   const animateDijkstras = (visitedNodesInOrder, nodesInShortestPath) => {
+    setDisable(true);
     for (let i = 0; i <= visitedNodesInOrder.length; i++) {
       if (i === visitedNodesInOrder.length) {
         setTimeout(() => {
@@ -355,6 +360,9 @@ const Board = () => {
       setTimeout(() => {
         const node = visitedNodesInOrder[i];
         if (node) {
+          if (node.status === 'target') {
+            setAlgoDone(true);
+          }
           if (node.status === 'start') {
             document.getElementById(`${node.row}-${node.column}`).className =
               'node start visited';
@@ -374,7 +382,7 @@ const Board = () => {
         const previousNode = nodesInShortestPath[i - 1];
 
         if (node.status === 'target') {
-          setAlgoDone(true);
+          setDisable(false);
           document.getElementById(`${node.row}-${node.column}`).className =
             'node node-shortest-path target start';
         } else {
@@ -392,26 +400,28 @@ const Board = () => {
   };
 
   const clearWalls = grid => {
-    const newGrid = grid.slice();
-    newGrid.forEach(row => {
-      row.forEach(node => {
-        if (node.status === 'wall') {
-          let newNode = {
-            ...node,
-            status: '',
-          };
-          newGrid[node.row][node.column] = newNode;
-        }
-        if (node.isVisited) {
-          let newNode = {
-            ...node,
-            isVisited: false,
-          };
-          newGrid[node.row][node.column] = newNode;
-        }
+    if (!disable) {
+      const newGrid = grid.slice();
+      newGrid.forEach(row => {
+        row.forEach(node => {
+          if (node.status === 'wall') {
+            let newNode = {
+              ...node,
+              status: '',
+            };
+            newGrid[node.row][node.column] = newNode;
+          }
+          if (node.isVisited) {
+            let newNode = {
+              ...node,
+              isVisited: false,
+            };
+            newGrid[node.row][node.column] = newNode;
+          }
+        });
       });
-    });
-    return newGrid;
+      setGrid(newGrid);
+    }
   };
 
   const removePattern = grid => {
@@ -471,7 +481,7 @@ const Board = () => {
 
   return (
     <div className='container'>
-      <button onClick={() => removePattern(grid)}>RESET GRID</button>
+      <button onClick={() => clearWalls(grid)}>Clear walls</button>
       <button onClick={() => visualizeDijkstras()}>Visualize Dijkstra</button>
       <table className={styles.grid}>
         <tbody>
