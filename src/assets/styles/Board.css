@@ -3,4 +3,5 @@ table {
   position: fixed;
   width: 99%;
   border-collapse: collapse;
+  z-index: 1;
 }

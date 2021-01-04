@@ -11,8 +11,8 @@ const Board = () => {
   const width = document.documentElement.clientWidth;
 
   // Calculates how many rows and columns the grid should contain, x or y / 30 where 30 is the pixel size of each node
-  let calculatedRows = Math.floor(height / 28) - 8;
-  let calculatedColumns = Math.floor(width / 28);
+  let calculatedRows = Math.floor(height / 30) - 7.5;
+  let calculatedColumns = Math.floor(width / 30);
 
   // Initial start node coordinates - sets the start row to be in the middle and the column to be on the left side
   const initialStartRow = Math.floor(calculatedRows / 2);

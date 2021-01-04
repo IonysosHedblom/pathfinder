@@ -1,30 +1,29 @@
 @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Coda:wght@400;800&display=swap');
 
 .menu {
   background-color: #1f2833;
-  font-family: 'Share Tech Mono', monospace;
-  height: 150px;
+  font-family: 'Coda', cursive;
+  height: 108px;
 }
 nav {
-  margin-right: 68px;
+  margin-right: 77px;
 }
 
 h1 {
   text-align: center;
-  color: #dadada;
-  font-size: 2.4rem;
+  color: #ebebeb;
+  font-size: 1.5rem;
   padding-top: 10px;
-  margin-bottom: 15px;
   letter-spacing: 2px;
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Coda', cursive;
   font-weight: 500;
 }
 
-ul {
-  color: #dadada;
-  width: 80%;
-  margin: 30px auto;
+.menu-list {
+  color: #ebebeb;
+  width: 85%;
+  margin: 10px auto;
   height: 50px;
   display: flex;
   justify-content: space-between;
@@ -32,24 +31,33 @@ ul {
   list-style: none;
 }
 
-ul li {
-  font-size: 1.2rem;
+.menu-list li {
+  font-size: 1rem;
   cursor: pointer;
 }
 
-ul li:hover {
+.menu-list li:hover {
   color: #88a3fc;
 }
 
-ul li button {
+.menu-list li button {
   cursor: pointer;
-  padding: 12px 40px;
+  padding: 7px 30px;
   font-size: 1.2rem;
-  background-color: #73ffa6;
   border: none;
+  background-color: #73ffa6;
   border-radius: 0.2em;
-  font-family: 'Share Tech Mono', monospace;
+  font-family: 'Coda', cursive;
   color: #21273a;
+  box-shadow: inset 0 0 20px rgba(255, 255, 255, 0);
+  text-shadow: none;
+}
+
+.menu-list li button:hover {
+  box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.5),
+    0 0 20px rgba(255, 255, 255, 0.2);
+
+  text-shadow: 0.2px 0.2px 0.5px #427388;
 }
 
 .dropdown-arrow {
@@ -76,4 +84,52 @@ ul li button {
   border-right: 7px solid transparent;
   border-left: 7px solid transparent;
   transform: rotate(-90deg);
+}
+
+.algo-dropdown {
+  background-color: #1f2833;
+  width: 15%;
+  display: block;
+  margin-left: 95px;
+  margin-top: -13px;
+  z-index: 2;
+  list-style: none;
+  border-radius: 0.4em;
+}
+
+.algo-dropdown li {
+  color: #ebebeb;
+  padding: 7px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.algo-dropdown li:hover {
+  background-color: #88a3fc;
+  border-radius: 0.4em;
+}
+
+.maze-dropdown {
+  background-color: #1f2833;
+  width: 15%;
+  display: block;
+  margin-left: 278px;
+  margin-top: -13px;
+  z-index: 2;
+  list-style: none;
+  border-radius: 0.4em;
+}
+
+.maze-dropdown li {
+  color: #ebebeb;
+  padding: 7px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.maze-dropdown li:hover {
+  background-color: #88a3fc;
+  border-radius: 0.4em;
+}
+
+.hidden {
+  display: none;
 }
