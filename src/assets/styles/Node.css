@@ -1,6 +1,6 @@
 .node {
-  height: 30px;
-  width: 30px;
+  height: 28px;
+  width: 28px;
   border: 1px solid #79c1ff;
   background-color: #fff;
 }
@@ -73,6 +73,11 @@
 .visited-reset {
   background-color: #6980c9;
 }
+
+.shortest-reset {
+  background-color: #60da8d;
+}
+
 /* Old school computer animation */
 /* @keyframes visitedAnimation {
   0% {

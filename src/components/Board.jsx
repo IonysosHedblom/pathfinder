@@ -11,8 +11,8 @@ const Board = () => {
   const width = document.documentElement.clientWidth;
 
   // Calculates how many rows and columns the grid should contain, x or y / 30 where 30 is the pixel size of each node
-  let calculatedRows = Math.floor(height / 30) - 6;
-  let calculatedColumns = Math.floor(width / 30);
+  let calculatedRows = Math.floor(height / 28) - 8;
+  let calculatedColumns = Math.floor(width / 28);
 
   // Initial start node coordinates - sets the start row to be in the middle and the column to be on the left side
   const initialStartRow = Math.floor(calculatedRows / 2);
@@ -114,53 +114,72 @@ const Board = () => {
   // Disables functionality while algo is running
   const [disable, setDisable] = useState(false);
 
-  const shortestPath = nodesInShortestPath => {
-    for (let i = 0; i < nodesInShortestPath.length; i++) {
-      const node = nodesInShortestPath[i];
-      const previousNode = nodesInShortestPath[i - 1];
-      if (node.status === 'target') {
-        document.getElementById(`${node.row}-${node.column}`).className =
-          'node node-shortest-path target start';
-      } else {
-        document.getElementById(`${node.row}-${node.column}`).className =
-          'node node-shortest-path start';
-      }
+  // COMMENT ABOUT LINE 119 - 179 -> these functions make it possible to see the dijkstras algorithm
+  // for the new position of the start / target node when moving it. Seemed a bit overkill to do this functionality
+  // So I decided to run with a version which clears the grid when moving the start/target node instead.
 
-      if (previousNode && previousNode.status !== 'start') {
-        document
-          .getElementById(`${previousNode.row}-${previousNode.column}`)
-          .classList.remove('start');
-      }
-    }
-  };
+  // const removeStatic = grid => {
+  //   grid.forEach(row => {
+  //     row.forEach(node => {
+  //       const nodeById = document.getElementById(`${node.row}-${node.column}`);
+  //       nodeById.classList.remove('visited-reset');
+  //       nodeById.classList.remove('shortest-reset');
+  //       if (node.status === 'target') {
+  //         nodeById.classList.remove('start');
+  //       }
+  //     });
+  //   });
+  //   setAlgoDone(false);
+  // };
 
-  const runDijkstra = () => {
-    resetGrid();
-    // removePattern(grid);
-    const visitedNodesInOrder = dijkstra(
-      grid,
-      grid[currentStartCoordinates[0]][currentStartCoordinates[1]],
-      grid[currentTargetCoordinates[0]][currentTargetCoordinates[1]]
-    );
-    const nodesInShortestPath = getNodesInShortestPath(
-      grid[currentTargetCoordinates[0]][currentTargetCoordinates[1]]
-    );
-    for (let i = 0; i <= visitedNodesInOrder.length; i++) {
-      if (i === visitedNodesInOrder.length) {
-        shortestPath(nodesInShortestPath);
-      }
-      const node = visitedNodesInOrder[i];
-      if (node) {
-        if (node.status === 'start') {
-          document.getElementById(`${node.row}-${node.column}`).className =
-            'node start visited';
-        } else {
-          document.getElementById(`${node.row}-${node.column}`).className =
-            'node visited';
-        }
-      }
-    }
-  };
+  // const shortestPath = nodesInShortestPath => {
+  //   for (let i = 0; i < nodesInShortestPath.length; i++) {
+  //     const node = nodesInShortestPath[i];
+  //     const previousNode = nodesInShortestPath[i - 1];
+  //     if (node.status === 'target') {
+  //       document.getElementById(`${node.row}-${node.column}`).className =
+  //         'node shortest-reset target start';
+  //     } else {
+  //       document.getElementById(`${node.row}-${node.column}`).className =
+  //         'node shortest-reset start';
+  //     }
+
+  //     if (previousNode && previousNode.status !== 'start') {
+  //       document
+  //         .getElementById(`${previousNode.row}-${previousNode.column}`)
+  //         .classList.remove('start');
+  //     }
+  //   }
+  // };
+
+  // const runStaticDijkstra = () => {
+  //   resetGrid();
+  //   // removePattern(grid);
+  //   const visitedNodesInOrder = dijkstra(
+  //     grid,
+  //     grid[currentStartCoordinates[0]][currentStartCoordinates[1]],
+  //     grid[currentTargetCoordinates[0]][currentTargetCoordinates[1]]
+  //   );
+  //   const nodesInShortestPath = getNodesInShortestPath(
+  //     grid[currentTargetCoordinates[0]][currentTargetCoordinates[1]]
+  //   );
+  //   for (let i = 0; i <= visitedNodesInOrder.length; i++) {
+  //     if (i === visitedNodesInOrder.length) {
+  //       shortestPath(nodesInShortestPath);
+  //     }
+  //     const node = visitedNodesInOrder[i];
+  //     if (node) {
+  //       if (node.status === 'start') {
+  //         document.getElementById(`${node.row}-${node.column}`).className =
+  //           'node start visited-reset';
+  //       } else {
+  //         document.getElementById(`${node.row}-${node.column}`).className =
+  //           'node visited-reset';
+  //       }
+  //     }
+  //   }
+  // };
+
   // Function to move the start node on mouse enter.
   // Replaces old start node with a normal node,
   // then adds the new start node to the current position in the grid
@@ -171,11 +190,13 @@ const Board = () => {
     const previousNode = grid[prevCoordinates[0]][prevCoordinates[1]];
     const twoStepsBack = grid[nodeTwoStepsBack[0]][nodeTwoStepsBack[1]];
 
-    // if (algoDone) {
-    removePattern(grid);
-    // resetGrid();
-    runDijkstra();
-    // }
+    // Simply removes the old dijkstras pattern if moving start node when algorithm is done running
+    if (algoDone) {
+      removePattern(grid);
+      // removeStatic(grid);
+      // resetGrid();
+      // runStaticDijkstra();
+    }
 
     if (twoStepsBack.status === 'start' && previousNode.status === 'target') {
       let newNode = {
@@ -246,8 +267,9 @@ const Board = () => {
       grid[prevTargetCoordinates[0]][prevTargetCoordinates[1]];
     const twoStepsBack = grid[targetTwoStepsBack[0]][targetTwoStepsBack[1]];
 
+    // Simply removes the old dijkstras pattern if moving start node when algorithm is done running
     if (algoDone) {
-      // removePattern(grid);
+      removePattern(grid);
       // resetGrid();
     }
 
@@ -385,6 +407,7 @@ const Board = () => {
   // Visualizes Dijkstras algorithm
   const visualizeDijkstras = () => {
     if (!disable) {
+      // removeStatic(grid);
       removePattern(grid);
       resetGrid();
       const start =
@@ -406,7 +429,7 @@ const Board = () => {
       if (i === visitedNodesInOrder.length) {
         setTimeout(() => {
           animateShortestPath(nodesInShortestPath);
-        }, 20 * i);
+        }, 7 * i);
       }
       setTimeout(() => {
         const node = visitedNodesInOrder[i];
@@ -422,7 +445,7 @@ const Board = () => {
               'node visited';
           }
         }
-      }, 20 * i);
+      }, 7 * i);
     }
   };
 

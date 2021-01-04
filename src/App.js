@@ -1,10 +1,12 @@
 import React from 'react';
 import Board from './components/Board';
-import './assets/styles/styles.css'
+import Menu from './components/Menu';
+import './assets/styles/styles.css';
 
 function App() {
   return (
-    <div className="App">
+    <div className='App'>
+      <Menu />
       <Board />
     </div>
   );
