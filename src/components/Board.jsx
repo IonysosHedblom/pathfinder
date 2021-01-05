@@ -5,6 +5,7 @@ import styles from '../assets/styles/Board.css';
 
 // Dijkstras
 import { dijkstra, getNodesInShortestPath } from '../algorithms/dijkstra';
+import { recursiveDivision } from '../algorithms/recursiveDivison';
 
 const Board = () => {
   // State for which algorithm is chosen
@@ -18,7 +19,7 @@ const Board = () => {
   const width = document.documentElement.clientWidth;
 
   // Calculates how many rows and columns the grid should contain, x or y / 30 where 30 is the pixel size of each node
-  let calculatedRows = Math.floor(height / 30) - 6;
+  let calculatedRows = Math.floor(height / 30) - 7;
   let calculatedColumns = Math.floor(width / 30);
 
   // Initial start node coordinates - sets the start row to be in the middle and the column to be on the left side
@@ -543,6 +544,42 @@ const Board = () => {
       visualizeDijkstras();
     }
   };
+  // const getAllNodes = grid => {
+  //   const nodes = [];
+  //   for (const row of grid) {
+  //     for (const node of row) {
+  //       nodes.push(node);
+  //     }
+  //   }
+  //   return nodes;
+  // };
+
+  // const recursiveDivisonMaze = grid => {
+  //   const nodes = getAllNodes(grid);
+  //   let relevantNodes = nodes.filter(
+  //     node => node.status === 'start' || node.status === 'target'
+  //   );
+  //   console.log(relevantNodes);
+  // };
+
+  const animateMaze = grid => {
+    const newGrid = grid.slice();
+    const wallsToAnimate = recursiveDivision(
+      grid,
+      2,
+      calculatedRows - 3,
+      2,
+      calculatedColumns - 3,
+      calculatedColumns,
+      calculatedRows,
+      false
+    );
+
+    wallsToAnimate.forEach(node => {
+      newGrid[node.row][node.column] = node;
+      setGrid(newGrid);
+    });
+  };
 
   return (
     <div>
@@ -560,6 +597,8 @@ const Board = () => {
         setSpeedValue={e => setSpeedValue(e)}
         clearWalls={() => clearWalls(grid)}
       />
+
+      <button onClick={() => animateMaze(grid)}>Test</button>
       <div className='container'>
         <table className={styles.grid}>
           <tbody>
