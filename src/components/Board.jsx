@@ -1,17 +1,20 @@
 import React, { useState } from 'react';
 import Node from './Node';
+import Menu from './Menu';
 import styles from '../assets/styles/Board.css';
 
 // Dijkstras
 import { dijkstra, getNodesInShortestPath } from '../algorithms/dijkstra';
 
 const Board = () => {
+  // State for which algorithm is chosen
+  const [algorithm, setAlgorithm] = useState('');
   // Calculates number of rows and columns based on window height
   const height = document.documentElement.clientHeight;
   const width = document.documentElement.clientWidth;
 
   // Calculates how many rows and columns the grid should contain, x or y / 30 where 30 is the pixel size of each node
-  let calculatedRows = Math.floor(height / 30) - 7.5;
+  let calculatedRows = Math.floor(height / 30) - 6;
   let calculatedColumns = Math.floor(width / 30);
 
   // Initial start node coordinates - sets the start row to be in the middle and the column to be on the left side
@@ -532,43 +535,51 @@ const Board = () => {
   };
 
   return (
-    <div className='container'>
-      <button onClick={() => clearWalls(grid)}>Clear walls</button>
-      <button onClick={() => visualizeDijkstras()}>Visualize Dijkstra</button>
-      <table className={styles.grid}>
-        <tbody>
-          {grid.map((row, rowIdx) => {
-            return (
-              <tr key={rowIdx}>
-                {row.map((node, nodeIdx) => {
-                  const { row, column, status, isVisited, shortest } = node;
+    <div>
+      <Menu
+        disable={disable}
+        setDisable={setDisable}
+        algorithm={algorithm}
+        setAlgorithm={e => setAlgorithm(e)}
+      />
+      <div className='container'>
+        <button onClick={() => clearWalls(grid)}>Clear walls</button>
+        <button onClick={() => visualizeDijkstras()}>Visualize Dijkstra</button>
+        <table className={styles.grid}>
+          <tbody>
+            {grid.map((row, rowIdx) => {
+              return (
+                <tr key={rowIdx}>
+                  {row.map((node, nodeIdx) => {
+                    const { row, column, status, isVisited, shortest } = node;
 
-                  return (
-                    <Node
-                      key={nodeIdx}
-                      shortest={shortest}
-                      row={row}
-                      column={column}
-                      status={status}
-                      isVisited={isVisited}
-                      isStartNodePressed={isStartNodePressed}
-                      isTargetNodePressed={isTargetNodePressed}
-                      pressedNode={pressedNode}
-                      onMouseDown={(row, column) =>
-                        handleMouseDown(row, column)
-                      }
-                      onMouseEnter={(row, column) =>
-                        handleMouseEnter(row, column)
-                      }
-                      onMouseUp={(row, column) => handleMouseUp(row, column)}
-                    ></Node>
-                  );
-                })}
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+                    return (
+                      <Node
+                        key={nodeIdx}
+                        shortest={shortest}
+                        row={row}
+                        column={column}
+                        status={status}
+                        isVisited={isVisited}
+                        isStartNodePressed={isStartNodePressed}
+                        isTargetNodePressed={isTargetNodePressed}
+                        pressedNode={pressedNode}
+                        onMouseDown={(row, column) =>
+                          handleMouseDown(row, column)
+                        }
+                        onMouseEnter={(row, column) =>
+                          handleMouseEnter(row, column)
+                        }
+                        onMouseUp={(row, column) => handleMouseUp(row, column)}
+                      ></Node>
+                    );
+                  })}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
