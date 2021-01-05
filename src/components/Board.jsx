@@ -9,6 +9,10 @@ import { dijkstra, getNodesInShortestPath } from '../algorithms/dijkstra';
 const Board = () => {
   // State for which algorithm is chosen
   const [algorithm, setAlgorithm] = useState('');
+  // State for algorithm speed
+  const [algorithmSpeed, setAlgorithmSpeed] = useState('Fast');
+  const [speedValue, setSpeedValue] = useState(10);
+
   // Calculates number of rows and columns based on window height
   const height = document.documentElement.clientHeight;
   const width = document.documentElement.clientWidth;
@@ -197,7 +201,7 @@ const Board = () => {
     if (algoDone) {
       removePattern(grid);
       // removeStatic(grid);
-      // resetGrid();
+      resetGrid();
       // runStaticDijkstra();
     }
 
@@ -273,7 +277,7 @@ const Board = () => {
     // Simply removes the old dijkstras pattern if moving start node when algorithm is done running
     if (algoDone) {
       removePattern(grid);
-      // resetGrid();
+      resetGrid();
     }
 
     if (twoStepsBack.status === 'target' && previousNode.status === 'start') {
@@ -432,7 +436,7 @@ const Board = () => {
       if (i === visitedNodesInOrder.length) {
         setTimeout(() => {
           animateShortestPath(nodesInShortestPath);
-        }, 7 * i);
+        }, speedValue * i);
       }
       setTimeout(() => {
         const node = visitedNodesInOrder[i];
@@ -448,7 +452,7 @@ const Board = () => {
               'node visited';
           }
         }
-      }, 7 * i);
+      }, speedValue * i);
     }
   };
 
@@ -534,17 +538,29 @@ const Board = () => {
     setGrid(newGrid);
   };
 
+  const startVisualize = () => {
+    if (algorithm === 'dijkstra') {
+      visualizeDijkstras();
+    }
+  };
+
   return (
     <div>
       <Menu
+        // grid={grid}
+        // setGrid={setGrid}
+        startVisualize={() => startVisualize()}
         disable={disable}
         setDisable={setDisable}
         algorithm={algorithm}
         setAlgorithm={e => setAlgorithm(e)}
+        algorithmSpeed={algorithmSpeed}
+        setAlgorithmSpeed={e => setAlgorithmSpeed(e)}
+        speedValue={speedValue}
+        setSpeedValue={e => setSpeedValue(e)}
+        clearWalls={() => clearWalls(grid)}
       />
       <div className='container'>
-        <button onClick={() => clearWalls(grid)}>Clear walls</button>
-        <button onClick={() => visualizeDijkstras()}>Visualize Dijkstra</button>
         <table className={styles.grid}>
           <tbody>
             {grid.map((row, rowIdx) => {

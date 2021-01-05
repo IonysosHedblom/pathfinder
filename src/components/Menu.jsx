@@ -2,7 +2,18 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 
 import '../assets/styles/Menu.css';
 
-const Menu = ({ algorithm, setAlgorithm, disable, setDisable }) => {
+const Menu = ({
+  algorithm,
+  setAlgorithm,
+  disable,
+  setDisable,
+  startVisualize,
+  algorithmSpeed,
+  setAlgorithmSpeed,
+  speedValue,
+  setSpeedValue,
+  clearWalls,
+}) => {
   const [showAlgos, setShowAlgos] = useState(false);
   const [showMazes, setShowMazes] = useState(false);
   const [showSpeedMenu, setShowSpeedMenu] = useState(false);
@@ -60,7 +71,18 @@ const Menu = ({ algorithm, setAlgorithm, disable, setDisable }) => {
     }
   };
 
-  console.log(disable);
+  const setSpeed = e => {
+    if (e.target.innerText === 'Normal') {
+      setAlgorithmSpeed('Normal');
+      setSpeedValue(25);
+    } else if (e.target.innerText === 'Fast (default)') {
+      setAlgorithmSpeed('Fast');
+      setSpeedValue(10);
+    } else if (e.target.innerText === 'Slow') {
+      setAlgorithmSpeed('Slow');
+      setSpeedValue(100);
+    }
+  };
 
   return (
     <div className='menu'>
@@ -85,17 +107,21 @@ const Menu = ({ algorithm, setAlgorithm, disable, setDisable }) => {
             </ul>
           </li>
           <li ref={speedDropdown} onClick={() => toggleSpeedDropdown()}>
-            Speed: fast<span className='dropdown-arrow'></span>
+            Speed: {algorithmSpeed}
+            <span className='dropdown-arrow'></span>
             <ul
               className={showSpeedMenu === true ? 'speed-dropdown' : 'hidden'}
             >
-              <li>Slow</li>
-              <li>Normal</li>
-              <li>Fast (default)</li>
+              <li onClick={e => setSpeed(e)}>Slow</li>
+              <li onClick={e => setSpeed(e)}>Normal</li>
+              <li onClick={e => setSpeed(e)}>Fast (default)</li>
             </ul>
           </li>
           <li>
-            <button className={disable ? 'disabled' : ''}>
+            <button
+              onClick={() => startVisualize()}
+              className={disable ? 'disabled' : ''}
+            >
               Start{' '}
               {algorithm === 'dijkstra'
                 ? "Dijkstra's"
@@ -106,8 +132,9 @@ const Menu = ({ algorithm, setAlgorithm, disable, setDisable }) => {
                 : ''}
             </button>
           </li>
-          <li>Clear board</li>
-          <li>Clear walls</li>
+          <li onClick={() => clearWalls()}>Clear walls</li>
+          <li>Reset board</li>
+
           <li>Tutorial</li>
         </ul>
       </nav>

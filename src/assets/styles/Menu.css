@@ -45,6 +45,7 @@ h1 {
   padding: 7px 30px;
   font-size: 1.2rem;
   border: none;
+  outline: none;
   background-color: #73ffa6;
   border-radius: 0.2em;
   font-family: 'Coda', cursive;
@@ -60,6 +61,13 @@ h1 {
   text-shadow: 0.2px 0.2px 0.5px #427388;
 }
 
+.menu-list li button:active {
+  background-color: #64d78e;
+  -webkit-box-shadow: inset 0px 0px 5px #c1c1c1;
+  -moz-box-shadow: inset 0px 0px 5px #c1c1c1;
+  box-shadow: inset 0px 0px 5px #c1c1c1;
+  outline: none;
+}
 .dropdown-arrow {
   display: inline-block;
   width: 0;
