@@ -1,21 +1,8 @@
 .node {
   height: 30px;
   width: 30px;
-  border: 1px solid #79c1ff;
+  border: 1px solid #79a4ff;
   background-color: #fff;
-}
-
-.wall {
-  /* background-color: #2b3661; */
-  border: none;
-  animation-name: wallAnimation;
-  animation-duration: 0.4s;
-  animation-timing-function: ease-out;
-  animation-delay: 0;
-  animation-direction: alternate;
-  animation-iteration-count: 1;
-  animation-fill-mode: forwards;
-  animation-play-state: running;
 }
 
 .start {
@@ -48,6 +35,19 @@
   animation-play-state: running;
 }
 
+.wall {
+  /* background-color: #2b3661; */
+  border: none;
+  animation-name: wallAnimation;
+  animation-duration: 0.4s;
+  animation-timing-function: ease-out;
+  animation-delay: 0;
+  animation-direction: alternate;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+  animation-play-state: running;
+}
+
 .visited {
   animation-name: visitedAnimation;
   animation-duration: 1.5s;
@@ -61,7 +61,7 @@
 
 .node-shortest-path {
   animation-name: shortestPath;
-  animation-duration: 1s;
+  animation-duration: 1.5s;
   animation-timing-function: ease;
   animation-delay: 0;
   animation-direction: alternate;
@@ -108,9 +108,25 @@
     border-radius: 100%;
   }
 
+  25% {
+    background-color: #333d5b;
+  }
+  /* 
+  35% {
+    background-color: #364060;
+  }
+
+  45% {
+    background-color: #3b4568;
+  } */
+
   50% {
     background-color: #3b466a;
   }
+
+  /* 65% {
+    background-color: #5a668b;
+  } */
 
   75% {
     transform: scale(1.2);
@@ -119,7 +135,7 @@
 
   100% {
     transform: scale(1);
-    background-color: #6980c9;
+    background-color: #5769a5;
   }
 }
 

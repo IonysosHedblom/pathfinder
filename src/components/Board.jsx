@@ -201,9 +201,8 @@ const Board = () => {
     // Simply removes the old dijkstras pattern if moving start node when algorithm is done running
     if (algoDone) {
       removePattern(grid);
-      // removeStatic(grid);
+
       resetGrid(grid);
-      // runStaticDijkstra();
     }
 
     if (twoStepsBack.status === 'start' && previousNode.status === 'target') {
@@ -339,25 +338,42 @@ const Board = () => {
     }
   };
 
-  // Allows to build walls when mouse is held over the nodes
+  //Allows to build walls when mouse is held over the nodes
   const buildWalls = (grid, row, column) => {
     const newGrid = grid.slice();
     const node = grid[row][column];
-    if (node.status === '') {
-      const newNode = {
-        ...node,
-        status: 'wall',
-      };
-      newGrid[row][column] = newNode;
-    }
     if (node.status === 'wall') {
-      const newNode = {
-        ...node,
-        status: '',
-      };
-      newGrid[row][column] = newNode;
+      document
+        .getElementById(`${node.row}-${node.column}`)
+        .classList.remove('wall');
+    } else if (node.status === '') {
+      document
+        .getElementById(`${node.row}-${node.column}`)
+        .classList.add('wall');
     }
-    return newGrid;
+  };
+
+  const updateWalls = grid => {
+    const newGrid = grid.slice();
+    grid.forEach(row => {
+      row.forEach(node => {
+        const nodeById = document.getElementById(`${node.row}-${node.column}`);
+        if (nodeById.classList.contains('wall')) {
+          let newNode = {
+            ...node,
+            status: 'wall',
+          };
+          newGrid[node.row][node.column] = newNode;
+        } else if (nodeById.className === 'node') {
+          let newNode = {
+            ...node,
+            status: '',
+          };
+          newGrid[node.row][node.column] = newNode;
+        }
+      });
+    });
+    setGrid(newGrid);
   };
 
   // Runs a function based on which node is pressed
@@ -399,8 +415,7 @@ const Board = () => {
         setGrid(newGrid);
       }
     } else if (pressedNode) {
-      const newGrid = buildWalls(grid, row, column);
-      setGrid(newGrid);
+      buildWalls(grid, row, column);
     }
   };
 
@@ -409,13 +424,12 @@ const Board = () => {
     setPressedNode(false);
     setIsStartNodePressed(false);
     setIsTargetNodePressed(false);
-    // setAlgoDone(false);
+    updateWalls(grid);
   };
 
   // Visualizes Dijkstras algorithm
   const visualizeDijkstras = () => {
     if (!disable) {
-      // removeStatic(grid);
       removePattern(grid);
       resetGrid(grid);
       const start =
@@ -638,8 +652,6 @@ const Board = () => {
   return (
     <div>
       <Menu
-        // grid={grid}
-        // setGrid={setGrid}
         resetAll={() => resetAll()}
         startVisualize={() => startVisualize()}
         disable={disable}
