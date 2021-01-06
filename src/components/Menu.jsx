@@ -13,6 +13,8 @@ const Menu = ({
   speedValue,
   setSpeedValue,
   clearWalls,
+  resetAll,
+  recursiveDivisionMaze,
 }) => {
   const [showAlgos, setShowAlgos] = useState(false);
   const [showMazes, setShowMazes] = useState(false);
@@ -81,6 +83,9 @@ const Menu = ({
     } else if (e.target.innerText === 'Slow') {
       setAlgorithmSpeed('Slow');
       setSpeedValue(100);
+    } else if (e.target.innerText === 'Ultra Slow') {
+      setAlgorithmSpeed('Ultra Slow');
+      setSpeedValue(500);
     }
   };
 
@@ -101,7 +106,9 @@ const Menu = ({
           <li ref={mazeDropdown} onClick={() => toggleMazeDropdown()}>
             Build Maze<span className='dropdown-arrow'></span>
             <ul className={showMazes === true ? 'maze-dropdown' : 'hidden'}>
-              <li>Recursive Division</li>
+              <li onClick={() => recursiveDivisionMaze()}>
+                Recursive Division
+              </li>
               <li>Random maze pattern</li>
               <li>Stair pattern</li>
             </ul>
@@ -112,6 +119,8 @@ const Menu = ({
             <ul
               className={showSpeedMenu === true ? 'speed-dropdown' : 'hidden'}
             >
+              <li onClick={e => setSpeed(e)}>Ultra Slow</li>
+
               <li onClick={e => setSpeed(e)}>Slow</li>
               <li onClick={e => setSpeed(e)}>Normal</li>
               <li onClick={e => setSpeed(e)}>Fast (default)</li>
@@ -133,7 +142,7 @@ const Menu = ({
             </button>
           </li>
           <li onClick={() => clearWalls()}>Clear walls</li>
-          <li>Reset board</li>
+          <li onClick={() => resetAll()}>Reset board</li>
 
           <li>Tutorial</li>
         </ul>

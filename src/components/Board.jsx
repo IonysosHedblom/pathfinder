@@ -202,7 +202,7 @@ const Board = () => {
     if (algoDone) {
       removePattern(grid);
       // removeStatic(grid);
-      resetGrid();
+      resetGrid(grid);
       // runStaticDijkstra();
     }
 
@@ -278,7 +278,7 @@ const Board = () => {
     // Simply removes the old dijkstras pattern if moving start node when algorithm is done running
     if (algoDone) {
       removePattern(grid);
-      resetGrid();
+      resetGrid(grid);
     }
 
     if (twoStepsBack.status === 'target' && previousNode.status === 'start') {
@@ -417,7 +417,7 @@ const Board = () => {
     if (!disable) {
       // removeStatic(grid);
       removePattern(grid);
-      resetGrid();
+      resetGrid(grid);
       const start =
         grid[currentStartCoordinates[0]][currentStartCoordinates[1]];
       const target =
@@ -483,8 +483,9 @@ const Board = () => {
 
   const clearWalls = grid => {
     if (!disable) {
+      removePattern(grid);
       const newGrid = grid.slice();
-      newGrid.forEach(row => {
+      grid.forEach(row => {
         row.forEach(node => {
           if (node.status === 'wall') {
             let newNode = {
@@ -520,7 +521,7 @@ const Board = () => {
     setAlgoDone(false);
   };
 
-  const resetGrid = () => {
+  const resetGrid = grid => {
     const newGrid = grid.slice();
 
     grid.forEach(row => {
@@ -539,6 +540,39 @@ const Board = () => {
     setGrid(newGrid);
   };
 
+  const resetAll = () => {
+    if (!disable) {
+      removePattern(grid);
+      const newGrid = createInitialGrid();
+      setCurrentStartCoordinates([initialStartRow, initialStartColumn]);
+      setCurrentTargetCoordinates([initialTargetRow, initialTargetColumn]);
+      setPrevCoordinates([initialStartRow, initialStartColumn]);
+      setPrevTargetCoordinates([initialTargetRow, initialTargetColumn]);
+
+      newGrid.forEach(row => {
+        row.forEach(node => {
+          let newNode = {
+            ...node,
+            status:
+              node.row === initialStartRow && node.column === initialStartColumn
+                ? 'start'
+                : node.row === initialTargetRow &&
+                  node.column === initialTargetColumn
+                ? 'target'
+                : '',
+            isVisited: false,
+            shortest: false,
+            distance: Infinity,
+            previousNode: null,
+          };
+          newGrid[node.row][node.column] = newNode;
+        });
+      });
+
+      setGrid(newGrid);
+    }
+  };
+
   const startVisualize = () => {
     if (algorithm === 'dijkstra') {
       visualizeDijkstras();
@@ -549,44 +583,55 @@ const Board = () => {
     const newGrid = grid.slice();
     for (let wall of walls) {
       let node = grid[wall[0]][wall[1]];
+
       let newNode = {
         ...node,
         status: 'wall',
       };
       newGrid[wall[0]][wall[1]] = newNode;
     }
-    return newGrid;
+
+    setGrid(newGrid);
   };
 
-  const animateMaze = walls => {
+  const animateMaze = (grid, walls) => {
     for (let i = 0; i <= walls.length; i++) {
       if (i === walls.length) {
+        resetGrid(grid);
+        clearWalls(grid);
         setTimeout(() => {
-          resetGrid();
-          removePattern(grid);
-          const newGrid = getGridWithMaze(grid, walls);
-          setGrid(newGrid);
-        }, 20 * i);
+          getGridWithMaze(grid, walls);
+          setDisable(false);
+        }, 10 * i);
+
         return;
       }
-      let wall = walls[i];
-      let node = grid[wall[0]][wall[1]];
+      const wall = walls[i];
+      const node = grid[wall[0]][wall[1]];
       setTimeout(() => {
         document.getElementById(`${node.row}-${node.column}`).className =
           'node wall';
-      }, 20 * i);
+      }, 10 * i);
     }
   };
 
-  const recursiveDivisonMaze = () => {
+  const recursiveDivisionMaze = () => {
     if (!disable) {
-      const start =
-        grid[currentStartCoordinates[0]][currentStartCoordinates[1]];
-      const target =
-        grid[currentTargetCoordinates[0]][currentTargetCoordinates[1]];
+      removePattern(grid);
 
-      const walls = recursiveDivision(grid, start, target);
-      animateMaze(walls);
+      resetGrid(grid);
+      setTimeout(() => {
+        const start =
+          grid[currentStartCoordinates[0]][currentStartCoordinates[1]];
+        const target =
+          grid[currentTargetCoordinates[0]][currentTargetCoordinates[1]];
+
+        setDisable(true);
+
+        const walls = recursiveDivision(grid, start, target);
+
+        animateMaze(grid, walls);
+      }, 10);
     }
   };
 
@@ -595,6 +640,7 @@ const Board = () => {
       <Menu
         // grid={grid}
         // setGrid={setGrid}
+        resetAll={() => resetAll()}
         startVisualize={() => startVisualize()}
         disable={disable}
         setDisable={setDisable}
@@ -605,9 +651,9 @@ const Board = () => {
         speedValue={speedValue}
         setSpeedValue={e => setSpeedValue(e)}
         clearWalls={() => clearWalls(grid)}
+        recursiveDivisionMaze={() => recursiveDivisionMaze()}
       />
 
-      <button onClick={() => recursiveDivisonMaze()}>Test</button>
       <div className='container'>
         <table className={styles.grid}>
           <tbody>

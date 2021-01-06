@@ -1,6 +1,7 @@
-const walls = [];
+let walls;
 
 export const recursiveDivision = (grid, start, target) => {
+  walls = [];
   if (!start || !target) {
     return;
   }
@@ -98,7 +99,7 @@ const addWall = (direction, number, vertical, horizontal, start, target) => {
     }
   }
   if (!isStartFinish) {
-    temporaryWalls.splice(generateNum(temporaryWalls.length), 1);
+    temporaryWalls.splice(generateEvenNum(temporaryWalls.length), 1);
   }
   for (let wall of temporaryWalls) {
     walls.push(wall);
@@ -120,7 +121,7 @@ const generateOddNum = array => {
   return array[randomNum];
 };
 
-const generateNum = max => {
+const generateEvenNum = max => {
   let randomNum =
     Math.floor(Math.random() * (max / 2)) +
     Math.floor(Math.random() * (max / 2));
