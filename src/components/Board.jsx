@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, Fragment } from 'react';
 import Node from './Node';
 import Menu from './Menu';
+import Info from './Info';
 import styles from '../assets/styles/Board.css';
 
-// Dijkstras
+import customAlgoArr from '../algoArray.js';
 import { dijkstra, getNodesInShortestPath } from '../algorithms/dijkstra';
 import { recursiveDivision } from '../algorithms/recursiveDivison';
+import { randomMaze } from '../algorithms/randomMaze';
 
 const Board = () => {
   // State for which algorithm is chosen
@@ -616,7 +618,7 @@ const Board = () => {
         setTimeout(() => {
           getGridWithMaze(grid, walls);
           setDisable(false);
-        }, 10 * i);
+        }, 20 * i);
 
         return;
       }
@@ -625,7 +627,7 @@ const Board = () => {
       setTimeout(() => {
         document.getElementById(`${node.row}-${node.column}`).className =
           'node wall';
-      }, 10 * i);
+      }, 20 * i);
     }
   };
 
@@ -643,14 +645,43 @@ const Board = () => {
         setDisable(true);
 
         const walls = recursiveDivision(grid, start, target);
+        console.log(walls);
+        animateMaze(grid, walls);
+      }, 20);
+    }
+  };
+
+  const buildRandomMaze = () => {
+    if (!disable) {
+      removePattern(grid);
+      resetGrid(grid);
+      setTimeout(() => {
+        const start =
+          grid[currentStartCoordinates[0]][currentStartCoordinates[1]];
+        const target =
+          grid[currentTargetCoordinates[0]][currentTargetCoordinates[1]];
+        setDisable(true);
+        const walls = randomMaze(grid, start, target);
 
         animateMaze(grid, walls);
-      }, 10);
+      }, 20);
+    }
+  };
+
+  const buildCustomMaze = () => {
+    if (!disable) {
+      removePattern(grid);
+      resetGrid(grid);
+      setTimeout(() => {
+        setDisable(true);
+
+        animateMaze(grid, customAlgoArr);
+      }, 20);
     }
   };
 
   return (
-    <div>
+    <Fragment>
       <Menu
         resetAll={() => resetAll()}
         startVisualize={() => startVisualize()}
@@ -664,7 +695,10 @@ const Board = () => {
         setSpeedValue={e => setSpeedValue(e)}
         clearWalls={() => clearWalls(grid)}
         recursiveDivisionMaze={() => recursiveDivisionMaze()}
+        buildRandomMaze={() => buildRandomMaze()}
+        buildCustomMaze={() => buildCustomMaze()}
       />
+      <Info />
 
       <div className='container'>
         <table className={styles.grid}>
@@ -702,7 +736,7 @@ const Board = () => {
           </tbody>
         </table>
       </div>
-    </div>
+    </Fragment>
   );
 };
 

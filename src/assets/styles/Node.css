@@ -1,7 +1,7 @@
 .node {
   height: 30px;
   width: 30px;
-  border: 1px solid #79a4ff;
+  border: 1px solid #90cbff;
   background-color: #fff;
 }
 
@@ -135,7 +135,7 @@
 
   100% {
     transform: scale(1);
-    background-color: #5769a5;
+    background-color: #758bcd;
   }
 }
 
@@ -191,7 +191,7 @@
 
   100% {
     transform: scale(1);
-    background-color: #222b4d;
+    background-color: #181f35;
   }
 }
 

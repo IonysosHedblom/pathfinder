@@ -1,0 +1,83 @@
+@import url('https://fonts.googleapis.com/css2?family=Coda:wght@400;800&display=swap');
+
+.info {
+  height: 100px;
+}
+
+.info ul {
+  display: flex;
+  flex-direction: row;
+  list-style: none;
+  justify-content: space-evenly;
+  align-items: center;
+  height: 100px;
+}
+
+.info ul li {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+
+  font-size: 1.2rem;
+  font-family: 'Coda', cursive;
+}
+
+.info-start {
+  background-image: url(../images/svg/startnode.svg);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  margin-right: 6px;
+  height: 27px;
+  width: 27px;
+}
+
+.info-target {
+  background-image: url(../images/svg/finishnode.svg);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  height: 27px;
+  width: 27px;
+  margin-right: 6px;
+}
+
+.info-unvisited {
+  height: 27px;
+  width: 27px;
+  border: 1px solid #79c1ff;
+  background-color: #fff;
+  margin-right: 6px;
+}
+
+.info-visited {
+  height: 27px;
+  width: 27px;
+  border: none;
+  background-color: #758bcd;
+  margin: 0 3px;
+}
+
+.info-visited2 {
+  height: 27px;
+  width: 27px;
+  border: none;
+  background-color: #3b466a;
+  margin-right: 6px;
+}
+
+.info-wall {
+  height: 27px;
+  width: 27px;
+  border: none;
+  background-color: #181f35;
+  margin-right: 6px;
+}
+
+.info-shortest {
+  height: 27px;
+  width: 27px;
+  border: none;
+  background-color: #60da8d;
+  margin-right: 6px;
+}
