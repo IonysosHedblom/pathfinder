@@ -1,104 +1,135 @@
-export const recursiveDivision = (
-  grid,
-  startRow,
-  endRow,
-  startColumn,
-  endColumn,
-  calculatedRows,
-  calculatedColumns,
-  surroundingWalls
-) => {
-  if (endRow < startRow || endColumn < startColumn) {
+const walls = [];
+
+export const recursiveDivision = (grid, start, target) => {
+  if (!start || !target) {
     return;
   }
-  const wallsToAnimate = [];
-  const nodes = getAllNodes(grid);
-  if (!surroundingWalls) {
-    let relevantNodes = nodes.filter(
-      node => node.status === 'start' || node.status === 'target'
-    );
-    nodes.forEach(node => {
-      if (!relevantNodes.includes(node)) {
-        let row = node.row;
-        let column = node.column;
-        if (
-          row === 0 ||
-          column === 0 ||
-          row === calculatedRows - 1 ||
-          column === calculatedColumns - 1
-        ) {
-          wallsToAnimate.push(node);
 
-          node.status = 'wall';
-        }
-      }
-    });
-    surroundingWalls = true;
-  }
+  let vertical = range(grid[0].length);
+  let horizontal = range(grid.length);
 
-  let possibleRows = [];
-  for (let number = startRow; number <= endRow; number += 2) {
-    possibleRows.push(number);
-  }
-  let possibleColumns = [];
-  for (let number = startColumn; number <= endColumn; number += 2) {
-    possibleColumns.push(number);
-  }
-  let randomRowIndex = Math.floor(Math.random() * possibleRows.length);
-  let randomColumnIndex = Math.floor(Math.random() * possibleColumns.length);
-  let currentRow = possibleRows[randomRowIndex];
-  let columnRandom = possibleColumns[randomColumnIndex];
-  nodes.forEach(node => {
-    let row = node.row;
-    let column = node.column;
-    if (
-      row === currentRow &&
-      column !== columnRandom &&
-      column >= startColumn - 1 &&
-      column <= endColumn + 1
-    ) {
-      if (
-        node.status !== 'start' &&
-        node.status !== 'target' &&
-        node.status !== 'wall'
-      ) {
-        wallsToAnimate.push(node);
-
-        node.status = 'wall';
-      }
-    }
-  });
-  if (currentRow - 2 - startRow > endColumn - startColumn) {
-    recursiveDivision(
-      grid,
-      startRow,
-      currentRow - 2,
-      startColumn,
-      endColumn,
-      surroundingWalls
-    );
-  }
-  if (endRow - (currentRow + 2) > endColumn - startColumn) {
-    recursiveDivision(
-      grid,
-      currentRow + 2,
-      endRow,
-      startColumn,
-      endColumn,
-      surroundingWalls
-    );
-  }
-
-  // console.log(wallsToAnimate);
-  return wallsToAnimate;
+  getWalls(vertical, horizontal, grid, start, target);
+  return walls;
 };
 
-const getAllNodes = grid => {
-  const nodes = [];
-  for (const row of grid) {
-    for (const node of row) {
-      nodes.push(node);
+const range = len => {
+  const result = [];
+  for (let i = 0; i < len; i++) {
+    result.push(i);
+  }
+  return result;
+};
+
+const getWalls = (vertical, horizontal, grid, start, target) => {
+  if (vertical.length < 2 || horizontal.length < 2) {
+    return;
+  }
+  let direction;
+  let number;
+  if (vertical.length > horizontal.length) {
+    direction = 0;
+    number = generateOddNum(vertical);
+  }
+  if (vertical.length <= horizontal.length) {
+    direction = 1;
+    number = generateOddNum(horizontal);
+  }
+  if (direction === 0) {
+    addWall(direction, number, vertical, horizontal, start, target);
+    getWalls(
+      vertical.slice(0, vertical.indexOf(number)),
+      horizontal,
+      grid,
+      start,
+      target
+    );
+    getWalls(
+      vertical.slice(vertical.indexOf(number) + 1),
+      horizontal,
+      grid,
+      start,
+      target
+    );
+  } else {
+    addWall(direction, number, vertical, horizontal, start, target);
+    getWalls(
+      vertical,
+      horizontal.slice(0, horizontal.indexOf(number)),
+      grid,
+      start,
+      target
+    );
+    getWalls(
+      vertical,
+      horizontal.slice(horizontal.indexOf(number) + 1),
+      grid,
+      start,
+      target
+    );
+  }
+};
+
+const addWall = (direction, number, vertical, horizontal, start, target) => {
+  let isStartFinish = false;
+  const temporaryWalls = [];
+  if (direction === 0) {
+    if (horizontal.length === 2) return;
+    for (let temporary of horizontal) {
+      if (
+        (temporary === start.row && number === start.column) ||
+        (temporary === target.row && number === target.column)
+      ) {
+        isStartFinish = true;
+        continue;
+      }
+      temporaryWalls.push([temporary, number]);
+    }
+  } else {
+    if (vertical.length === 2) return;
+    for (let temporary of vertical) {
+      if (
+        (number === start.row && temporary === start.column) ||
+        (number === target.row && temporary === target.column)
+      ) {
+        isStartFinish = true;
+        continue;
+      }
+      temporaryWalls.push([number, temporary]);
     }
   }
-  return nodes;
+  if (!isStartFinish) {
+    temporaryWalls.splice(generateNum(temporaryWalls.length), 1);
+  }
+  for (let wall of temporaryWalls) {
+    walls.push(wall);
+  }
+};
+
+const generateOddNum = array => {
+  const maxNum = array.length - 1;
+  let randomNum =
+    Math.floor(Math.random() * (maxNum / 2)) +
+    Math.floor(Math.random() * (maxNum / 2));
+  if (randomNum % 2 === 0) {
+    if (randomNum === maxNum) {
+      randomNum--;
+    } else {
+      randomNum++;
+    }
+  }
+  return array[randomNum];
+};
+
+const generateNum = max => {
+  let randomNum =
+    Math.floor(Math.random() * (max / 2)) +
+    Math.floor(Math.random() * (max / 2));
+  if (randomNum % 2 !== 0) {
+    if (randomNum === max) {
+      randomNum--;
+    } else {
+      randomNum++;
+    }
+  }
+  return randomNum;
 };

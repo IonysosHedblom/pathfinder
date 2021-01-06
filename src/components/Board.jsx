@@ -544,41 +544,50 @@ const Board = () => {
       visualizeDijkstras();
     }
   };
-  // const getAllNodes = grid => {
-  //   const nodes = [];
-  //   for (const row of grid) {
-  //     for (const node of row) {
-  //       nodes.push(node);
-  //     }
-  //   }
-  //   return nodes;
-  // };
 
-  // const recursiveDivisonMaze = grid => {
-  //   const nodes = getAllNodes(grid);
-  //   let relevantNodes = nodes.filter(
-  //     node => node.status === 'start' || node.status === 'target'
-  //   );
-  //   console.log(relevantNodes);
-  // };
-
-  const animateMaze = grid => {
+  const getGridWithMaze = (grid, walls) => {
     const newGrid = grid.slice();
-    const wallsToAnimate = recursiveDivision(
-      grid,
-      2,
-      calculatedRows - 3,
-      2,
-      calculatedColumns - 3,
-      calculatedColumns,
-      calculatedRows,
-      false
-    );
+    for (let wall of walls) {
+      let node = grid[wall[0]][wall[1]];
+      let newNode = {
+        ...node,
+        status: 'wall',
+      };
+      newGrid[wall[0]][wall[1]] = newNode;
+    }
+    return newGrid;
+  };
 
-    wallsToAnimate.forEach(node => {
-      newGrid[node.row][node.column] = node;
-      setGrid(newGrid);
-    });
+  const animateMaze = walls => {
+    for (let i = 0; i <= walls.length; i++) {
+      if (i === walls.length) {
+        setTimeout(() => {
+          resetGrid();
+          removePattern(grid);
+          const newGrid = getGridWithMaze(grid, walls);
+          setGrid(newGrid);
+        }, 20 * i);
+        return;
+      }
+      let wall = walls[i];
+      let node = grid[wall[0]][wall[1]];
+      setTimeout(() => {
+        document.getElementById(`${node.row}-${node.column}`).className =
+          'node wall';
+      }, 20 * i);
+    }
+  };
+
+  const recursiveDivisonMaze = () => {
+    if (!disable) {
+      const start =
+        grid[currentStartCoordinates[0]][currentStartCoordinates[1]];
+      const target =
+        grid[currentTargetCoordinates[0]][currentTargetCoordinates[1]];
+
+      const walls = recursiveDivision(grid, start, target);
+      animateMaze(walls);
+    }
   };
 
   return (
@@ -598,7 +607,7 @@ const Board = () => {
         clearWalls={() => clearWalls(grid)}
       />
 
-      <button onClick={() => animateMaze(grid)}>Test</button>
+      <button onClick={() => recursiveDivisonMaze()}>Test</button>
       <div className='container'>
         <table className={styles.grid}>
           <tbody>
