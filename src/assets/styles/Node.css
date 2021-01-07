@@ -70,37 +70,6 @@
   animation-play-state: running;
 }
 
-.visited-reset {
-  background-color: #6980c9;
-}
-
-.shortest-reset {
-  background-color: #60da8d;
-}
-
-/* Old school computer animation */
-/* @keyframes visitedAnimation {
-  0% {
-    transform: scale(0.3);
-    background-color: #292e49;
-    border-radius: 100%;
-  }
-
-  50% {
-    background-color: #536976;
-  }
-
-  75% {
-    transform: scale(1.2);
-    background-color: #889fac;
-  }
-
-  100% {
-    transform: scale(1);
-    background-color: #bbd2c5;
-  }
-} */
-/* Preferred atm */
 @keyframes visitedAnimation {
   0% {
     transform: scale(0.3);
@@ -111,22 +80,10 @@
   25% {
     background-color: #333d5b;
   }
-  /* 
-  35% {
-    background-color: #364060;
-  }
-
-  45% {
-    background-color: #3b4568;
-  } */
 
   50% {
     background-color: #3b466a;
   }
-
-  /* 65% {
-    background-color: #5a668b;
-  } */
 
   75% {
     transform: scale(1.2);
@@ -139,41 +96,18 @@
   }
 }
 
-/* COLD ANIMATION  */
-/* @keyframes visitedAnimation {
-  0% {
-    transform: scale(0.3);
-    background-color: #2a5174;
-    border-radius: 100%;
-  }
-
-  50% {
-    background-color: #356894;
-  }
-
-  75% {
-    transform: scale(1.2);
-    background-color: #468ac6;
-  }
-
-  100% {
-    transform: scale(1);
-    background-color: #54a1e4;
-  }
-} */
-
 @keyframes specialNodes {
   0% {
     transform: scale(0.3);
   }
 
   50% {
-    transform: scale(1);
+    transform: scale(0.8);
     /*background-color: darkslategrey;*/
   }
 
   100% {
-    transform: scale(0.9);
+    transform: scale(1);
     /*background-color: darkslategrey;*/
   }
 }
@@ -213,5 +147,3 @@
     background-color: #60da8d;
   }
 }
-
-/* transition #000428 */

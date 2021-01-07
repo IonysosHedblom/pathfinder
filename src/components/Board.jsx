@@ -6,6 +6,7 @@ import styles from '../assets/styles/Board.css';
 
 import customAlgoArr from '../algoArray.js';
 import { dijkstra, getNodesInShortestPath } from '../algorithms/dijkstra';
+import { astar, nodesInShortestPathAstar } from '../algorithms/astar';
 import { recursiveDivision } from '../algorithms/recursiveDivison';
 import { randomMaze } from '../algorithms/randomMaze';
 
@@ -45,6 +46,7 @@ const Board = () => {
           : '',
       isVisited: false,
       distance: Infinity,
+      totalDistance: Infinity,
       previousNode: null,
       shortest: false,
     };
@@ -443,11 +445,28 @@ const Board = () => {
 
       const nodesInShortestPath = getNodesInShortestPath(target);
 
-      animateDijkstras(visitedNodesInOrder, nodesInShortestPath);
+      animateAlgorithm(visitedNodesInOrder, nodesInShortestPath);
     }
   };
-  // Animates Dijkstras algorithm
-  const animateDijkstras = (visitedNodesInOrder, nodesInShortestPath) => {
+
+  const visualizeAstar = () => {
+    if (!disable) {
+      removePattern(grid);
+      resetGrid(grid);
+      const start =
+        grid[currentStartCoordinates[0]][currentStartCoordinates[1]];
+      const target =
+        grid[currentTargetCoordinates[0]][currentTargetCoordinates[1]];
+
+      const visitedNodesInOrder = astar(grid, start, target);
+
+      const nodesInShortestPath = nodesInShortestPathAstar(target);
+
+      animateAlgorithm(visitedNodesInOrder, nodesInShortestPath);
+    }
+  };
+
+  const animateAlgorithm = (visitedNodesInOrder, nodesInShortestPath) => {
     setDisable(true);
     for (let i = 0; i <= visitedNodesInOrder.length; i++) {
       if (i === visitedNodesInOrder.length) {
@@ -547,6 +566,7 @@ const Board = () => {
           isVisited: false,
           shortest: false,
           distance: Infinity,
+          totalDistance: Infinity,
           previousNode: null,
         };
         newGrid[node.row][node.column] = newNode;
@@ -592,6 +612,8 @@ const Board = () => {
   const startVisualize = () => {
     if (algorithm === 'dijkstra') {
       visualizeDijkstras();
+    } else if (algorithm === 'astar') {
+      visualizeAstar();
     }
   };
 
