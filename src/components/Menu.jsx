@@ -16,7 +16,7 @@ const Menu = ({
   resetAll,
   recursiveDivisionMaze,
   buildRandomMaze,
-  buildCustomMaze,
+  buildRandomWeightMaze,
 }) => {
   const [showAlgos, setShowAlgos] = useState(false);
   const [showMazes, setShowMazes] = useState(false);
@@ -112,7 +112,9 @@ const Menu = ({
                 Recursive Division
               </li>
               <li onClick={() => buildRandomMaze()}>Random maze pattern</li>
-              <li onClick={() => buildCustomMaze()}>One way maze</li>
+              <li onClick={() => buildRandomWeightMaze()}>
+                Random Weight Maze
+              </li>
             </ul>
           </li>
           <li ref={speedDropdown} onClick={() => toggleSpeedDropdown()}>

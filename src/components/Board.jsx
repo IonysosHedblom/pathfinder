@@ -4,7 +4,6 @@ import Menu from './Menu';
 import Info from './Info';
 import styles from '../assets/styles/Board.css';
 
-import customAlgoArr from '../algoArray.js';
 import { dijkstra, getNodesInShortestPath } from '../algorithms/dijkstra';
 import { astar, nodesInShortestPathAstar } from '../algorithms/astar';
 import {
@@ -574,9 +573,13 @@ const Board = () => {
           if (node.status === 'target') {
             setAlgoDone(true);
           }
+
           if (node.status === 'start') {
             document.getElementById(`${node.row}-${node.column}`).className =
               'node start visited';
+          } else if (node.status === 'weight') {
+            document.getElementById(`${node.row}-${node.column}`).className =
+              'node visited weight';
           } else {
             document.getElementById(`${node.row}-${node.column}`).className =
               'node visited';
@@ -683,6 +686,7 @@ const Board = () => {
   const resetAll = () => {
     if (!disable) {
       removePattern(grid);
+      clearWalls(grid);
       const newGrid = createInitialGrid();
       setCurrentStartCoordinates([initialStartRow, initialStartColumn]);
       setCurrentTargetCoordinates([initialTargetRow, initialTargetColumn]);
@@ -738,6 +742,21 @@ const Board = () => {
     setGrid(newGrid);
   };
 
+  const getGridWithWeightMaze = (grid, weights) => {
+    const newGrid = grid.slice();
+    for (let weight of weights) {
+      let node = grid[weight[0]][weight[1]];
+
+      let newNode = {
+        ...node,
+        status: 'weight',
+      };
+      newGrid[weight[0]][weight[1]] = newNode;
+    }
+
+    setGrid(newGrid);
+  };
+
   const animateMaze = (grid, walls) => {
     for (let i = 0; i <= walls.length; i++) {
       if (i === walls.length) {
@@ -759,6 +778,27 @@ const Board = () => {
     }
   };
 
+  const animateWeightMaze = (grid, weights) => {
+    for (let i = 0; i <= weights.length; i++) {
+      if (i === weights.length) {
+        resetGrid(grid);
+        clearWalls(grid);
+        setTimeout(() => {
+          getGridWithWeightMaze(grid, weights);
+          setDisable(false);
+        }, 20 * i);
+
+        return;
+      }
+      const weight = weights[i];
+      const node = grid[weight[0]][weight[1]];
+      setTimeout(() => {
+        document.getElementById(`${node.row}-${node.column}`).className =
+          'node weight';
+      }, 20 * i);
+    }
+  };
+
   const recursiveDivisionMaze = () => {
     if (!disable) {
       removePattern(grid);
@@ -773,7 +813,7 @@ const Board = () => {
         setDisable(true);
 
         const walls = recursiveDivision(grid, start, target);
-        console.log(walls);
+
         animateMaze(grid, walls);
       }, 20);
     }
@@ -796,14 +836,20 @@ const Board = () => {
     }
   };
 
-  const buildCustomMaze = () => {
+  const buildRandomWeightMaze = () => {
     if (!disable) {
       removePattern(grid);
       resetGrid(grid);
       setTimeout(() => {
         setDisable(true);
+        const start =
+          grid[currentStartCoordinates[0]][currentStartCoordinates[1]];
+        const target =
+          grid[currentTargetCoordinates[0]][currentTargetCoordinates[1]];
+        setDisable(true);
+        const weights = randomMaze(grid, start, target);
 
-        animateMaze(grid, customAlgoArr);
+        animateWeightMaze(grid, weights);
       }, 20);
     }
   };
@@ -824,7 +870,7 @@ const Board = () => {
         clearWalls={() => clearWalls(grid)}
         recursiveDivisionMaze={() => recursiveDivisionMaze()}
         buildRandomMaze={() => buildRandomMaze()}
-        buildCustomMaze={() => buildCustomMaze()}
+        buildRandomWeightMaze={() => buildRandomWeightMaze()}
       />
       <Info algorithm={algorithm} setAlgorithm={setAlgorithm} />
 

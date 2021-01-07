@@ -49,7 +49,7 @@ const updateUnvisitedNeighbors = (node, grid) => {
   const unvisitedNeighbors = getUnvisitedNeighbors(node, grid);
   for (const neighbor of unvisitedNeighbors) {
     if (neighbor.status === 'weight') {
-      neighbor.distance = node.distance + 5;
+      neighbor.distance = node.distance + 10;
     } else {
       neighbor.distance = node.distance + 1;
     }
