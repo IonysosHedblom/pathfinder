@@ -1,4 +1,4 @@
-import React, { useState, Fragment } from 'react';
+import React, { useState, Fragment, useEffect, useCallback } from 'react';
 import Node from './Node';
 import Menu from './Menu';
 import Info from './Info';
@@ -7,6 +7,10 @@ import styles from '../assets/styles/Board.css';
 import customAlgoArr from '../algoArray.js';
 import { dijkstra, getNodesInShortestPath } from '../algorithms/dijkstra';
 import { astar, nodesInShortestPathAstar } from '../algorithms/astar';
+import {
+  depthFirstSearch,
+  nodesInShortestPathDfs,
+} from '../algorithms/depthfirstsearch';
 import { recursiveDivision } from '../algorithms/recursiveDivison';
 import { randomMaze } from '../algorithms/randomMaze';
 
@@ -120,11 +124,14 @@ const Board = () => {
   // Checks whether the start/target node is currently on a wall node - if it is, the wall node is temporarily replaces with the
   // start/target node. Once the start/target node leaves the wall node, it is re-rendered into a wall node again.
   const [isOnWallNode, setIsOnWallNode] = useState(false);
+  const [isOnWeightNode, setIsOnWeightNode] = useState(false);
 
   // Checks if the algorithm animation is done
   const [algoDone, setAlgoDone] = useState(false);
   // Disables functionality while algo is running
   const [disable, setDisable] = useState(false);
+
+  const weightKeyPressed = useKeyPress('w');
 
   // COMMENT ABOUT LINE 119 - 179 -> these functions make it possible to see the dijkstras algorithm
   // for the new position of the start / target node when moving it. Seemed a bit overkill to do this functionality
@@ -219,6 +226,7 @@ const Board = () => {
 
     if (currentNode.status === '') {
       setIsOnWallNode(false);
+      setIsOnWeightNode(false);
       let newNode = {
         ...currentNode,
         status: 'start',
@@ -230,6 +238,15 @@ const Board = () => {
       newGrid[row][column] = newNode;
     } else if (currentNode.status === 'wall') {
       setIsOnWallNode(true);
+
+      let newNode = {
+        ...currentNode,
+        status: 'start',
+      };
+
+      newGrid[row][column] = newNode;
+    } else if (currentNode.status === 'weight') {
+      setIsOnWeightNode(true);
       let newNode = {
         ...currentNode,
         status: 'start',
@@ -249,6 +266,22 @@ const Board = () => {
       let newPreviousNode = {
         ...previousNode,
         status: 'wall',
+      };
+
+      newGrid[prevCoordinates[0]][prevCoordinates[1]] = newPreviousNode;
+    }
+
+    if (previousNode.status === 'start' && !isOnWeightNode) {
+      let newPreviousNode = {
+        ...previousNode,
+        isVisited: false,
+        status: '',
+      };
+      newGrid[prevCoordinates[0]][prevCoordinates[1]] = newPreviousNode;
+    } else if (isOnWeightNode && previousNode.status === 'start') {
+      let newPreviousNode = {
+        ...previousNode,
+        status: 'weight',
       };
 
       newGrid[prevCoordinates[0]][prevCoordinates[1]] = newPreviousNode;
@@ -294,6 +327,7 @@ const Board = () => {
 
     if (currentNode.status === '') {
       setIsOnWallNode(false);
+      setIsOnWeightNode(false);
       let newNode = {
         ...currentNode,
         status: 'target',
@@ -307,6 +341,13 @@ const Board = () => {
         status: 'target',
       };
 
+      newGrid[row][column] = newNode;
+    } else if (currentNode.status === 'weight') {
+      setIsOnWeightNode(true);
+      let newNode = {
+        ...currentNode,
+        status: 'target',
+      };
       newGrid[row][column] = newNode;
     }
 
@@ -323,6 +364,25 @@ const Board = () => {
       let newPreviousNode = {
         ...previousNode,
         status: 'wall',
+      };
+      newGrid[prevTargetCoordinates[0]][
+        prevTargetCoordinates[1]
+      ] = newPreviousNode;
+    }
+
+    if (previousNode.status === 'target' && !isOnWeightNode) {
+      let newPreviousNode = {
+        ...previousNode,
+        status: '',
+      };
+
+      newGrid[prevTargetCoordinates[0]][
+        prevTargetCoordinates[1]
+      ] = newPreviousNode;
+    } else if (isOnWeightNode && previousNode.status === 'target') {
+      let newPreviousNode = {
+        ...previousNode,
+        status: 'weight',
       };
       newGrid[prevTargetCoordinates[0]][
         prevTargetCoordinates[1]
@@ -346,14 +406,26 @@ const Board = () => {
   const buildWalls = (grid, row, column) => {
     const newGrid = grid.slice();
     const node = grid[row][column];
-    if (node.status === 'wall') {
-      document
-        .getElementById(`${node.row}-${node.column}`)
-        .classList.remove('wall');
-    } else if (node.status === '') {
-      document
-        .getElementById(`${node.row}-${node.column}`)
-        .classList.add('wall');
+    if (weightKeyPressed && algorithm !== 'dfs') {
+      if (node.status === '') {
+        document
+          .getElementById(`${node.row}-${node.column}`)
+          .classList.add('weight');
+      } else if (node.status === 'weight') {
+        document
+          .getElementById(`${node.row}-${node.column}`)
+          .classList.remove('weight');
+      }
+    } else {
+      if (node.status === 'wall') {
+        document
+          .getElementById(`${node.row}-${node.column}`)
+          .classList.remove('wall');
+      } else if (node.status === '') {
+        document
+          .getElementById(`${node.row}-${node.column}`)
+          .classList.add('wall');
+      }
     }
   };
 
@@ -362,6 +434,13 @@ const Board = () => {
     grid.forEach(row => {
       row.forEach(node => {
         const nodeById = document.getElementById(`${node.row}-${node.column}`);
+        if (nodeById.classList.contains('weight')) {
+          let newNode = {
+            ...node,
+            status: 'weight',
+          };
+          newGrid[node.row][node.column] = newNode;
+        }
         if (nodeById.classList.contains('wall')) {
           let newNode = {
             ...node,
@@ -384,6 +463,7 @@ const Board = () => {
   const handleMouseDown = (row, column) => {
     // removePattern(grid);
     // resetGrid();
+
     if (getStartNode(grid, row, column) && !disable) {
       setIsStartNodePressed(true);
     } else if (getTargetNode(grid, row, column) && !disable) {
@@ -466,6 +546,20 @@ const Board = () => {
     }
   };
 
+  const visualizeDfs = () => {
+    if (!disable) {
+      removePattern(grid);
+      resetGrid(grid);
+      const start =
+        grid[currentStartCoordinates[0]][currentStartCoordinates[1]];
+      const target =
+        grid[currentTargetCoordinates[0]][currentTargetCoordinates[1]];
+      const visitedNodesInOrder = depthFirstSearch(grid, start, target);
+      const nodesInShortestPath = nodesInShortestPathDfs(target);
+      animateAlgorithm(visitedNodesInOrder, nodesInShortestPath);
+    }
+  };
+
   const animateAlgorithm = (visitedNodesInOrder, nodesInShortestPath) => {
     setDisable(true);
     for (let i = 0; i <= visitedNodesInOrder.length; i++) {
@@ -523,6 +617,16 @@ const Board = () => {
       grid.forEach(row => {
         row.forEach(node => {
           if (node.status === 'wall') {
+            let newNode = {
+              ...node,
+              status: '',
+            };
+            newGrid[node.row][node.column] = newNode;
+          }
+          if (node.status === 'weight') {
+            document
+              .getElementById(`${node.row}-${node.column}`)
+              .classList.remove('weight');
             let newNode = {
               ...node,
               status: '',
@@ -614,6 +718,8 @@ const Board = () => {
       visualizeDijkstras();
     } else if (algorithm === 'astar') {
       visualizeAstar();
+    } else if (algorithm === 'dfs') {
+      visualizeDfs();
     }
   };
 
@@ -720,7 +826,7 @@ const Board = () => {
         buildRandomMaze={() => buildRandomMaze()}
         buildCustomMaze={() => buildCustomMaze()}
       />
-      <Info />
+      <Info algorithm={algorithm} setAlgorithm={setAlgorithm} />
 
       <div className='container'>
         <table className={styles.grid}>
@@ -761,5 +867,37 @@ const Board = () => {
     </Fragment>
   );
 };
+
+function useKeyPress(targetKey) {
+  // State for keeping track of whether key is pressed
+  const [keyPressed, setKeyPressed] = useState(false);
+
+  // If pressed key is our target key then set to true
+  function downHandler({ key }) {
+    if (key === targetKey) {
+      setKeyPressed(true);
+    }
+  }
+
+  // If released key is our target key then set to false
+  const upHandler = ({ key }) => {
+    if (key === targetKey) {
+      setKeyPressed(false);
+    }
+  };
+
+  // Add event listeners
+  useEffect(() => {
+    window.addEventListener('keydown', downHandler);
+    window.addEventListener('keyup', upHandler);
+    // Remove event listeners on cleanup
+    return () => {
+      window.removeEventListener('keydown', downHandler);
+      window.removeEventListener('keyup', upHandler);
+    };
+  }, []); // Empty array ensures that effect is only run on mount and unmount
+
+  return keyPressed;
+}
 
 export default Board;

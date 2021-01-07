@@ -1,7 +1,7 @@
 import React from 'react';
 import '../assets/styles/Info.css';
 
-const Info = () => {
+const Info = ({ algorithm, setAlgorithm }) => {
   return (
     <div className='info'>
       <ul>
@@ -26,6 +26,15 @@ const Info = () => {
           <div className='info-shortest'></div>Shortest-path Node
         </li>
       </ul>
+      <p className='algo-info'>
+        {algorithm === 'dijkstra'
+          ? "Dijkstra's Algorithm is weighted and guarantees the shortest path. It's a classic pathfinding algorithm."
+          : algorithm === 'astar'
+          ? 'A* Search is the best pathfinding algorithm; uses heuristics to guarantee the shortest path.'
+          : algorithm === 'dfs'
+          ? 'Depth-First Search is unweighted and a very bad algorithm for pathfinding. Does not guarantee the shortest path.'
+          : ''}
+      </p>
     </div>
   );
 };

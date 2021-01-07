@@ -1,14 +1,14 @@
 export const astar = (grid, start, target) => {
-  // if (!start || !target) {
-  //   return;
-  // }
+  if (!start || !target) {
+    return;
+  }
   const unvisitedNodes = [];
   const visitedNodesInOrder = [];
 
   start.distance = 0;
   unvisitedNodes.push(start);
 
-  while (unvisitedNodes.length !== 0) {
+  while (!!unvisitedNodes.length) {
     unvisitedNodes.sort((a, b) => a.totalDistance - b.totalDistance);
 
     let closestNode = unvisitedNodes.shift();
@@ -18,8 +18,13 @@ export const astar = (grid, start, target) => {
     let neighbours = getNeighbours(closestNode, grid);
 
     for (let neighbour of neighbours) {
-      let distance = closestNode.distance + 1;
-      console.log(neighbourNotInUnvisitedNodes(neighbour, unvisitedNodes));
+      let distance;
+      if (closestNode.status === 'weight') {
+        distance = closestNode.distance + 15;
+      } else {
+        distance = closestNode.distance + 1;
+      }
+
       if (neighbourNotInUnvisitedNodes(neighbour, unvisitedNodes)) {
         unvisitedNodes.unshift(neighbour);
         neighbour.distance = distance;

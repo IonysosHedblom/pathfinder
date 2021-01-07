@@ -70,8 +70,8 @@ const Menu = ({
       setAlgorithm('dijkstra');
     } else if (e.target.innerText === 'A* Search') {
       setAlgorithm('astar');
-    } else if (e.target.innerText === 'Breadth-first Search') {
-      setAlgorithm('bfs');
+    } else if (e.target.innerText === 'Depth-first Search') {
+      setAlgorithm('dfs');
     }
   };
 
@@ -101,7 +101,7 @@ const Menu = ({
             <ul className={showAlgos === true ? 'algo-dropdown' : 'hidden'}>
               <li onClick={e => changeAlgorithm(e)}>Dijkstra's Algorithm</li>
               <li onClick={e => changeAlgorithm(e)}>A* Search</li>
-              <li onClick={e => changeAlgorithm(e)}>Breadth-first Search</li>
+              <li onClick={e => changeAlgorithm(e)}>Depth-first Search</li>
             </ul>
           </li>
 
@@ -138,8 +138,8 @@ const Menu = ({
                 ? "Dijkstra's"
                 : algorithm === 'astar'
                 ? 'A*'
-                : algorithm === 'bfs'
-                ? 'BFS'
+                : algorithm === 'dfs'
+                ? 'DFS'
                 : ''}
             </button>
           </li>
