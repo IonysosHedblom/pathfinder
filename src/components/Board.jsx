@@ -2,6 +2,7 @@ import React, { useState, Fragment, useEffect, useCallback } from 'react';
 import Node from './Node';
 import Menu from './Menu';
 import Info from './Info';
+import Tutorial from './Tutorial';
 import styles from '../assets/styles/Board.css';
 
 import { dijkstra, getNodesInShortestPath } from '../algorithms/dijkstra';
@@ -19,6 +20,9 @@ const Board = () => {
   // State for algorithm speed
   const [algorithmSpeed, setAlgorithmSpeed] = useState('Fast');
   const [speedValue, setSpeedValue] = useState(10);
+
+  // State for  tutoria popup
+  const [showTutorial, setShowTutorial] = useState(false);
 
   // Calculates number of rows and columns based on window height
   const height = document.documentElement.clientHeight;
@@ -275,8 +279,6 @@ const Board = () => {
 
     return newGrid;
   };
-
-  console.log(isOnWeightNode);
 
   // Checks whether the node at (row, column) is the current start node
   const getStartNode = (grid, row, column) => {
@@ -834,9 +836,15 @@ const Board = () => {
         recursiveDivisionMaze={() => recursiveDivisionMaze()}
         buildRandomMaze={() => buildRandomMaze()}
         buildRandomWeightMaze={() => buildRandomWeightMaze()}
+        showTutorial={showTutorial}
+        setShowTutorial={e => setShowTutorial(e)}
       />
       <Info algorithm={algorithm} setAlgorithm={setAlgorithm} />
 
+      <Tutorial
+        showTutorial={showTutorial}
+        setShowTutorial={() => setShowTutorial()}
+      />
       <div className='container'>
         <table className={styles.grid}>
           <tbody>

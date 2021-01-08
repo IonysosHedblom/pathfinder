@@ -17,6 +17,8 @@ const Menu = ({
   recursiveDivisionMaze,
   buildRandomMaze,
   buildRandomWeightMaze,
+  showTutorial,
+  setShowTutorial,
 }) => {
   const [showAlgos, setShowAlgos] = useState(false);
   const [showMazes, setShowMazes] = useState(false);
@@ -41,6 +43,9 @@ const Menu = ({
     setShowSpeedMenu(!showSpeedMenu);
     setShowMazes(false);
     setShowAlgos(false);
+  };
+  const toggleTutorial = e => {
+    setShowTutorial(!showTutorial);
   };
   const closeDropdowns = useCallback(
     e => {
@@ -91,9 +96,11 @@ const Menu = ({
     }
   };
 
+  console.log(showTutorial);
+
   return (
     <div className='menu'>
-      <h1>Pathfinding Algorithm Visualizer</h1>
+      <h1>The Trailblazer</h1>
       <nav>
         <ul className='menu-list'>
           <li ref={algoDropdown} onClick={() => toggleAlgoDropdown()}>
@@ -148,7 +155,7 @@ const Menu = ({
           <li onClick={() => clearWalls()}>Clear walls</li>
           <li onClick={() => resetAll()}>Reset board</li>
 
-          <li>Tutorial</li>
+          <li onClick={e => toggleTutorial(e)}>Tutorial</li>
         </ul>
       </nav>
     </div>

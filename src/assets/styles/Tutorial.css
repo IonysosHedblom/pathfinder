@@ -1,11 +1,52 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+
 .tutorial-container {
   position: absolute;
-  background-color: #fff;
-  border: 2px solid black;
-  border-radius: 0.4em;
-  min-height: 600px;
-  top: 22%;
-  left: 30%;
+  background-color: #1f2833;
+
+  border-radius: 0.2em;
+  height: 70%;
+  width: 50%;
+  float: right;
+  bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  text-align: center;
+  font-family: 'Lato', sans-serif;
+  box-shadow: 0 19px 38px rgba(0, 0, 0, 0.3), 0 15px 12px rgba(0, 0, 0, 0.22);
+}
+
+.tutorial-first-page {
+  display: flex;
+  flex-direction: column;
+  height: 80%;
+  justify-content: space-between;
+  color: #ebebeb;
+  margin-top: 30px;
+}
+
+h3 {
+  font-weight: 700;
+  color: #ebebeb;
+  font-size: 2.5rem;
+}
+
+h6 {
+  font-size: 1.7rem;
+  font-weight: 400;
+  margin-top: -10px;
+  margin-bottom: 40px;
+}
+
+.purpose-paragraph {
+  font-size: 1.3rem;
+}
+
+.skip-paragraph {
+  font-size: 1.3rem;
 }
 
 .rocket-img {
@@ -13,7 +54,62 @@
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
-  height: 200px;
+  height: 180px;
+}
+
+.page-counter {
+  position: absolute;
+  right: 2%;
+  top: 1%;
+  font-size: 1.5rem;
+  color: #ebebeb;
+}
+
+.tutorial-button-group {
+  margin-top: 20px;
+  display: flex;
+}
+
+.tutorial-button {
+  cursor: pointer;
+  padding: 7px 30px;
+  font-size: 1.1rem;
+  border: none;
+  outline: none;
+  background-color: #73ffa6;
+  border-radius: 0.2em;
+  font-family: 'Coda', sans-serif;
+  color: #21273a;
+  box-shadow: inset 0 0 20px rgba(255, 255, 255, 0);
+  text-shadow: none;
+}
+
+.tutorial-button:hover {
+  box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.5),
+    0 0 20px rgba(255, 255, 255, 0.2);
+
+  text-shadow: 0.2px 0.2px 0.5px #427388;
+}
+
+.tutorial-button:active {
+  background-color: #64d78e;
+  -webkit-box-shadow: inset 0px 0px 5px #c1c1c1;
+  -moz-box-shadow: inset 0px 0px 5px #c1c1c1;
+  box-shadow: inset 0px 0px 5px #c1c1c1;
+  outline: none;
+}
+
+.previous {
+  margin-left: auto;
+}
+
+.next {
+  margin-right: 20px;
+  margin-left: 12px;
+}
+
+.skip {
+  margin-left: 20px;
 }
 
 .hidden {
