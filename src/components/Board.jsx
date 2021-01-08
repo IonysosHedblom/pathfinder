@@ -225,7 +225,7 @@ const Board = () => {
 
     if (currentNode.status === '') {
       setIsOnWallNode(false);
-      // setIsOnWeightNode(false);
+      setIsOnWeightNode(false);
       let newNode = {
         ...currentNode,
         status: 'start',
@@ -245,15 +245,17 @@ const Board = () => {
 
       newGrid[row][column] = newNode;
     }
-    // else if (currentNode.status === 'weight') {
-    //   setIsOnWeightNode(true);
-    //   let newNode = {
-    //     ...currentNode,
-    //     status: 'start',
-    //   };
 
-    //   newGrid[row][column] = newNode;
-    // }
+    if (currentNode.status === 'weight') {
+      setIsOnWeightNode(true);
+
+      let newNode = {
+        ...currentNode,
+        status: 'start',
+      };
+
+      newGrid[row][column] = newNode;
+    }
 
     if (previousNode.status === 'start' && !isOnWallNode) {
       let newPreviousNode = {
@@ -271,24 +273,10 @@ const Board = () => {
       newGrid[prevCoordinates[0]][prevCoordinates[1]] = newPreviousNode;
     }
 
-    // if (previousNode.status === 'start' && !isOnWeightNode) {
-    //   let newPreviousNode = {
-    //     ...previousNode,
-    //     isVisited: false,
-    //     status: '',
-    //   };
-    //   newGrid[prevCoordinates[0]][prevCoordinates[1]] = newPreviousNode;
-    // } else if (isOnWeightNode && previousNode.status === 'start') {
-    //   let newPreviousNode = {
-    //     ...previousNode,
-    //     status: 'weight',
-    //   };
-
-    //   newGrid[prevCoordinates[0]][prevCoordinates[1]] = newPreviousNode;
-    // }
-
     return newGrid;
   };
+
+  console.log(isOnWeightNode);
 
   // Checks whether the node at (row, column) is the current start node
   const getStartNode = (grid, row, column) => {
@@ -343,14 +331,6 @@ const Board = () => {
 
       newGrid[row][column] = newNode;
     }
-    // else if (currentNode.status === 'weight') {
-    //   setIsOnWeightNode(true);
-    //   let newNode = {
-    //     ...currentNode,
-    //     status: 'target',
-    //   };
-    //   newGrid[row][column] = newNode;
-    // }
 
     if (previousNode.status === 'target' && !isOnWallNode) {
       let newPreviousNode = {
@@ -370,25 +350,6 @@ const Board = () => {
         prevTargetCoordinates[1]
       ] = newPreviousNode;
     }
-
-    // if (previousNode.status === 'target' && !isOnWeightNode) {
-    //   let newPreviousNode = {
-    //     ...previousNode,
-    //     status: '',
-    //   };
-
-    //   newGrid[prevTargetCoordinates[0]][
-    //     prevTargetCoordinates[1]
-    //   ] = newPreviousNode;
-    // } else if (isOnWeightNode && previousNode.status === 'target') {
-    //   let newPreviousNode = {
-    //     ...previousNode,
-    //     status: 'weight',
-    //   };
-    //   newGrid[prevTargetCoordinates[0]][
-    //     prevTargetCoordinates[1]
-    //   ] = newPreviousNode;
-    // }
 
     return newGrid;
   };

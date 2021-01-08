@@ -1,0 +1,21 @@
+.tutorial-container {
+  position: absolute;
+  background-color: #fff;
+  border: 2px solid black;
+  border-radius: 0.4em;
+  min-height: 600px;
+  top: 22%;
+  left: 30%;
+}
+
+.rocket-img {
+  background-image: url('../images/svg/rocket.svg');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 200px;
+}
+
+.hidden {
+  display: none;
+}
