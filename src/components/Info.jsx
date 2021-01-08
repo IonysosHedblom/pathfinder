@@ -12,6 +12,9 @@ const Info = ({ algorithm, setAlgorithm }) => {
           <div className='info-target'></div>Target Node
         </li>
         <li>
+          <div className='info-weight'></div>Weight Node
+        </li>
+        <li>
           <div className='info-unvisited'></div>Unvisited Node
         </li>
         <li>

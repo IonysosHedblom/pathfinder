@@ -42,6 +42,16 @@
   margin-right: 6px;
 }
 
+.info-weight {
+  background-image: url(../images/svg/weightnode.svg);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  height: 27px;
+  width: 27px;
+  margin-right: 6px;
+}
+
 .info-unvisited {
   height: 27px;
   width: 27px;
