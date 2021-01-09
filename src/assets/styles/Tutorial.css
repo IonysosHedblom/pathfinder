@@ -19,7 +19,7 @@
   box-shadow: 0 19px 38px rgba(0, 0, 0, 0.3), 0 15px 12px rgba(0, 0, 0, 0.22);
 }
 
-.tutorial-first-page {
+.tutorial-page {
   display: flex;
   flex-direction: column;
   height: 80%;
@@ -41,6 +41,17 @@ h6 {
   margin-bottom: 40px;
 }
 
+/* .page-two-h6 {
+  margin-top: -50px;
+} */
+
+/* .path-img {
+  background-image: url('../images/svg/atob.jpg');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 180px;
+} */
 .purpose-paragraph {
   font-size: 1.3rem;
 }
