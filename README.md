@@ -1,3 +1,9 @@
+# The Trailblazer
+
+Welcome to the Trailblazer! I build this app because pathfinding algorithms fascinated me. I wanted to see whether I could visualize them. I hope you enjoy!
+
+## Everything below this line was automatically created by Create React App
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
