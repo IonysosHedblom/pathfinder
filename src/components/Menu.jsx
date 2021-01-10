@@ -96,8 +96,6 @@ const Menu = ({
     }
   };
 
-  console.log(showTutorial);
-
   return (
     <div className='menu'>
       <h1>The Trailblazer</h1>

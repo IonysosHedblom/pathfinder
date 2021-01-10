@@ -1,4 +1,4 @@
-import React, { useState, Fragment, useEffect, useCallback } from 'react';
+import React, { useState, Fragment, useEffect } from 'react';
 import Node from './Node';
 import Menu from './Menu';
 import Info from './Info';
@@ -368,7 +368,6 @@ const Board = () => {
 
   //Allows to build walls when mouse is held over the nodes
   const buildWalls = (grid, row, column) => {
-    const newGrid = grid.slice();
     const node = grid[row][column];
     if (weightKeyPressed && algorithm !== 'dfs') {
       if (node.status === '') {
