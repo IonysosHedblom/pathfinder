@@ -22,7 +22,7 @@ const Board = () => {
   const [speedValue, setSpeedValue] = useState(10);
 
   // State for  tutoria popup
-  const [showTutorial, setShowTutorial] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(true);
 
   // Calculates number of rows and columns based on window height
   const height = document.documentElement.clientHeight;
