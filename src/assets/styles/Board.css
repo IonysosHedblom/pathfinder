@@ -1,7 +1,7 @@
 table {
-  bottom: 10px;
-  position: fixed;
+  /* bottom: 10px;
+  position: fixed; */
   width: 99%;
   border-collapse: collapse;
-  z-index: -1;
+  z-index: 1;
 }

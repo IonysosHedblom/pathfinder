@@ -838,7 +838,6 @@ const Board = () => {
         showTutorial={showTutorial}
         setShowTutorial={e => setShowTutorial(e)}
       />
-      <Info algorithm={algorithm} setAlgorithm={setAlgorithm} />
 
       <Tutorial
         showTutorial={showTutorial}
@@ -880,6 +879,7 @@ const Board = () => {
           </tbody>
         </table>
       </div>
+      <Info algorithm={algorithm} setAlgorithm={setAlgorithm} />
     </Fragment>
   );
 };

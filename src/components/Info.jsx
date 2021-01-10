@@ -29,15 +29,6 @@ const Info = ({ algorithm, setAlgorithm }) => {
           <div className='info-shortest'></div>Shortest-path Node
         </li>
       </ul>
-      <p className='algo-info'>
-        {algorithm === 'dijkstra'
-          ? "Dijkstra's Algorithm is weighted and guarantees the shortest path. It's a classic pathfinding algorithm."
-          : algorithm === 'astar'
-          ? 'A* Search is the best pathfinding algorithm; uses heuristics to guarantee the shortest path.'
-          : algorithm === 'dfs'
-          ? 'Depth-First Search is unweighted and a very bad algorithm for pathfinding. Does not guarantee the shortest path.'
-          : ''}
-      </p>
     </div>
   );
 };

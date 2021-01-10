@@ -98,11 +98,12 @@ const Menu = ({
 
   return (
     <div className='menu'>
-      <h1>The Trailblazer</h1>
+      <h1>The Pathfinder</h1>
       <nav>
         <ul className='menu-list'>
           <li ref={algoDropdown} onClick={() => toggleAlgoDropdown()}>
-            Algorithms<span className='dropdown-arrow'></span>
+            Algorithms
+            <span className='dropdown-arrow'></span>
             <ul className={showAlgos === true ? 'algo-dropdown' : 'hidden'}>
               <li onClick={e => changeAlgorithm(e)}>Dijkstra's Algorithm</li>
               <li onClick={e => changeAlgorithm(e)}>A* Search</li>
@@ -142,11 +143,11 @@ const Menu = ({
             >
               Start{' '}
               {algorithm === 'dijkstra'
-                ? "Dijkstra's"
+                ? ": Dijkstra's"
                 : algorithm === 'astar'
-                ? 'A*'
+                ? ': A*'
                 : algorithm === 'dfs'
-                ? 'DFS'
+                ? ': DFS'
                 : ''}
             </button>
           </li>
