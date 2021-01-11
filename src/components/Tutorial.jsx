@@ -9,7 +9,9 @@ const Tutorial = ({ showTutorial, setShowTutorial }) => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const handlePreviousClick = e => {
-    if (currentPage !== 1) {
+    if (currentPage === 1) {
+      setCurrentPage(8);
+    } else {
       setCurrentPage(currentPage - 1);
     }
   };
@@ -25,7 +27,7 @@ const Tutorial = ({ showTutorial, setShowTutorial }) => {
     currentPage === 1 ? (
       <div className='tutorial-page'>
         <h3>
-          Welcome to the Trailblazer App!
+          Welcome to The Pathfinder App!
           <hr />
         </h3>
 
@@ -118,25 +120,20 @@ const Tutorial = ({ showTutorial, setShowTutorial }) => {
           <hr />
         </h3>
         <h6 className='page-seven-h6'>
-          Use the navbar buttons to visualize algorithms and to do other stuff.
+          Use the navbar buttons to visualize algorithms, change the speed of
+          the visualizer or let the app build a maze for you.
         </h6>
-        <p className='navbar-info'>
-          You can clear the walls, weight or even the entire board. And also try
-          visualizing the algorithm on different speeds, all from the navbar.
-          You can access this tutorial again by clicking the tutorial button in
-          the navbar (top-right of your screen).
-        </p>
 
         <div className='navbar-img'></div>
       </div>
     ) : currentPage === 7 ? (
       <div className='tutorial-page'>
         <h3>
-          What is the purpose of Trailblazer?
+          What is the purpose of The Pathfinder?
           <hr />
         </h3>
         <h6 className='page-two-h6'>
-          Essentially, the Trailblazer is a pathfinding algorithm visualizer.
+          Essentially, The Pathfinder is a pathfinding algorithm visualizer.
         </h6>
         <div className='page-two-paragraphs'>
           <p className='page-two-explanation'>
@@ -145,9 +142,10 @@ const Tutorial = ({ showTutorial, setShowTutorial }) => {
             selection of pathfinding algorithms in action, and more.
           </p>
           <p className='page-two-explanation'>
-            The algorithms available in the Trailblazer are adapted for a 2D
+            The algorithms available in The Pathfinder are adapted for a 2D
             grid, where 90 degree turns have a "cost" of 1 and movements from a
-            node to another also have a "cost" of 1.
+            node to another also have a "cost" of 1. Weights have a "cost" of
+            10.
           </p>
         </div>
 

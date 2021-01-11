@@ -143,11 +143,11 @@ const Menu = ({
             >
               Start{' '}
               {algorithm === 'dijkstra'
-                ? ": Dijkstra's"
+                ? "Dijkstra's"
                 : algorithm === 'astar'
-                ? ': A*'
+                ? 'A*'
                 : algorithm === 'dfs'
-                ? ': DFS'
+                ? 'DFS'
                 : ''}
             </button>
           </li>
