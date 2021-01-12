@@ -116,7 +116,7 @@ const Tutorial = ({ showTutorial, setShowTutorial }) => {
     ) : currentPage === 6 ? (
       <div className='tutorial-page'>
         <h3>
-          Visualize and more
+          Visualize and more!
           <hr />
         </h3>
         <h6 className='page-seven-h6'>
