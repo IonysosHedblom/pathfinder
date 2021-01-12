@@ -144,8 +144,8 @@ const Tutorial = ({ showTutorial, setShowTutorial }) => {
           <p className='page-two-explanation'>
             The algorithms available in The Pathfinder are adapted for a 2D
             grid, where 90 degree turns have a "cost" of 1 and movements from a
-            node to another also have a "cost" of 1. Weights have a "cost" of
-            10.
+            node to another also have a "cost" of 1. In this application,
+            weights have a "cost" of 10.
           </p>
         </div>
 
