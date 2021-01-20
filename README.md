@@ -1,6 +1,6 @@
-# The Trailblazer
+# The Pathfinder
 
-Welcome to the Trailblazer! I built this app because pathfinding algorithms fascinated me. I wanted to see whether I could visualize them. I hope you enjoy!
+Welcome to the Pathfinder! I built this application because I find pathfinding algorithms interesting. So I wanted to see whether I could build something that visualizes some of the most popular algorithms in action. I really enjoyed the process of building this project and eventhough it was challenging, I learned alot.  If you are unsure of what a pathfinding algorithm is or how to use the application, there is a tutorial that explains everything. Hope you enjoy using the application.
 
 ## Everything below this line was automatically created by Create React App
 
