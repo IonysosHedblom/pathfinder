@@ -492,6 +492,8 @@ const Board = () => {
     }
   };
 
+
+// Visualizes A* Search algorithm
   const visualizeAstar = () => {
     if (!disable) {
       removePattern(grid);
@@ -509,6 +511,8 @@ const Board = () => {
     }
   };
 
+
+  // Visualizes Depth-first Search algorithm
   const visualizeDfs = () => {
     if (!disable) {
       removePattern(grid);
@@ -613,6 +617,8 @@ const Board = () => {
     }
   };
 
+
+  // Removes the visited nodes pattern
   const removePattern = grid => {
     grid.forEach(row => {
       row.forEach(node => {
@@ -627,6 +633,8 @@ const Board = () => {
     setAlgoDone(false);
   };
 
+
+  // Resets the nodes (not start or target positions)
   const resetGrid = grid => {
     const newGrid = grid.slice();
 
@@ -647,6 +655,7 @@ const Board = () => {
     setGrid(newGrid);
   };
 
+  // Resets the entire board(even start and target node positions)
   const resetAll = () => {
     if (!disable) {
       removePattern(grid);
@@ -681,6 +690,8 @@ const Board = () => {
     }
   };
 
+
+  // Starts visualizing the algorithm based on which one is picked
   const startVisualize = () => {
     if (algorithm === 'dijkstra') {
       visualizeDijkstras();
@@ -763,6 +774,8 @@ const Board = () => {
     }
   };
 
+
+  // Animates recursive divison maze with walls
   const recursiveDivisionMaze = () => {
     if (!disable) {
       removePattern(grid);
@@ -783,6 +796,7 @@ const Board = () => {
     }
   };
 
+  // Animates random maze with walls
   const buildRandomMaze = () => {
     if (!disable) {
       removePattern(grid);
@@ -800,6 +814,8 @@ const Board = () => {
     }
   };
 
+
+  // Animates random maze with weights
   const buildRandomWeightMaze = () => {
     if (!disable) {
       removePattern(grid);
@@ -884,6 +900,8 @@ const Board = () => {
   );
 };
 
+
+// Funtion used  to check if "W"-key is pressed. Used to build weights (can be used for other keys as well, not just "W"-key)
 function useKeyPress(targetKey) {
   // State for keeping track of whether key is pressed
   const [keyPressed, setKeyPressed] = useState(false);
