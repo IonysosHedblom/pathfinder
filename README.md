@@ -2,6 +2,12 @@
 
 Welcome to the Pathfinder! I built this application because I find pathfinding algorithms interesting. So I wanted to see whether I could build something that visualizes some of the most popular algorithms. I really enjoyed the process of building this project and eventhough it was challenging, I learned alot.  If you are unsure of what a pathfinding algorithm is or how to use the application, there is a tutorial that explains everything in the application. Hope you enjoy using the Pathfinder.
 
+
+# Below is a link to a demo of the application
+
+https://ionysoshedblom.github.io/pathfinder/
+
+
 ## Everything below this line was automatically created by Create React App
 
 # Getting Started with Create React App
