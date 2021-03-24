@@ -212,7 +212,7 @@ const Board = () => {
     const previousNode = grid[prevCoordinates[0]][prevCoordinates[1]];
     const twoStepsBack = grid[nodeTwoStepsBack[0]][nodeTwoStepsBack[1]];
 
-    // Simply removes the old dijkstras pattern if moving start node when algorithm is done running
+    // Simply removes the old algorithm pattern if moving start node when algorithm is done running
     if (algoDone) {
       removePattern(grid);
 
