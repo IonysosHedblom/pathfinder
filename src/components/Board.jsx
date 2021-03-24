@@ -136,7 +136,7 @@ const Board = () => {
 
   const weightKeyPressed = useKeyPress('w');
 
-  // COMMENT ABOUT LINE 119 - 179 -> these functions make it possible to see the dijkstras algorithm
+  // COMMENT ABOUT LINE 139 - 203 -> these functions make it possible to see the dijkstras algorithm
   // for the new position of the start / target node when moving the start/target node. Seemed a bit overkill to do this functionality
   // So I decided to run with a version which clears the grid when moving the start/target node instead.
 
