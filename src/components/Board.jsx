@@ -1,56 +1,48 @@
-import React, { useState, Fragment, useEffect } from 'react';
-import Node from './Node';
-import Menu from './Menu';
-import Info from './Info';
-import Tutorial from './Tutorial';
-import styles from '../assets/styles/Board.css';
+import React, { useState, Fragment, useEffect } from "react";
+import Node from "./Node";
+import Menu from "./Menu";
+import Info from "./Info";
+import Tutorial from "./Tutorial";
+import styles from "../assets/styles/Board.css";
 
-import { dijkstra, getNodesInShortestPath } from '../algorithms/dijkstra';
-import { astar, nodesInShortestPathAstar } from '../algorithms/astar';
+import { dijkstra, getNodesInShortestPath } from "../algorithms/dijkstra";
+import { astar, nodesInShortestPathAstar } from "../algorithms/astar";
 import {
   depthFirstSearch,
   nodesInShortestPathDfs,
-} from '../algorithms/depthfirstsearch';
-import { recursiveDivision } from '../algorithms/recursiveDivison';
-import { randomMaze } from '../algorithms/randomMaze';
+} from "../algorithms/depthfirstsearch";
+import { recursiveDivision } from "../algorithms/recursiveDivison";
+import { randomMaze } from "../algorithms/randomMaze";
 
 const Board = () => {
-  // State for which algorithm is chosen
-  const [algorithm, setAlgorithm] = useState('');
-  // State for algorithm speed
-  const [algorithmSpeed, setAlgorithmSpeed] = useState('Fast');
+  const [algorithm, setAlgorithm] = useState("");
+  const [algorithmSpeed, setAlgorithmSpeed] = useState("Fast");
   const [speedValue, setSpeedValue] = useState(10);
 
-  // State for  tutoria popup
   const [showTutorial, setShowTutorial] = useState(true);
 
-  // Calculates number of rows and columns based on window height
   const height = document.documentElement.clientHeight;
   const width = document.documentElement.clientWidth;
 
-  // Calculates how many rows and columns the grid should contain, x or y / 30 where 30 is the pixel size of each node
   let calculatedRows = Math.floor(height / 30) - 7;
   let calculatedColumns = Math.floor(width / 30);
 
-  // Initial start node coordinates - sets the start row to be in the middle and the column to be on the left side
   const initialStartRow = Math.floor(calculatedRows / 2);
   const initialStartColumn = Math.floor(calculatedColumns / 4);
 
-  // Initial target node coordinates - sets the target row to be in the middle and the column to be on the right side
   const initialTargetRow = Math.floor(calculatedRows / 2);
   const initialTargetColumn = Math.floor((3 * calculatedColumns) / 4);
 
-  // Creates initial nodes for the grid state
   const createNode = (row, column) => {
     return {
       row,
       column,
       status:
         row === initialStartRow && column === initialStartColumn
-          ? 'start'
+          ? "start"
           : row === initialTargetRow && column === initialTargetColumn
-          ? 'target'
-          : '',
+          ? "target"
+          : "",
       isVisited: false,
       distance: Infinity,
       totalDistance: Infinity,
@@ -59,7 +51,6 @@ const Board = () => {
     };
   };
 
-  // Creates the initial grid to use in state
   const createInitialGrid = () => {
     const grid = [];
     for (let row = 0; row < calculatedRows; row++) {
@@ -72,206 +63,117 @@ const Board = () => {
     return grid;
   };
 
-  // Stores the grid in state
   const [grid, setGrid] = useState(createInitialGrid);
 
-  // State of when the startNode is pressed
   const [isStartNodePressed, setIsStartNodePressed] = useState(false);
 
-  // State of when the targetNode is pressed
   const [isTargetNodePressed, setIsTargetNodePressed] = useState(false);
 
-  // State of when an empty / wall node is pressed
   const [pressedNode, setPressedNode] = useState(false);
 
-  // Keeps track of the previous coordinates of the start node
-  // so the previous start nodes can be re-rendered into normal or wall nodes - otherwise it leaves a trail with start nodes
   const [prevCoordinates, setPrevCoordinates] = useState([
     initialStartRow,
     initialStartColumn,
   ]);
 
-  // Stores the coordinates of the start node
   const [currentStartCoordinates, setCurrentStartCoordinates] = useState([
     initialStartRow,
     initialStartColumn,
   ]);
 
-  // Stores coordinates of target node
   const [currentTargetCoordinates, setCurrentTargetCoordinates] = useState([
     initialTargetRow,
     initialTargetColumn,
   ]);
 
-  // Keeps track of the previous coordinates of the target node
-  // so the previous target nodes can be re-rendered into normal or wall nodes - otherwise it leaves a trail with target nodes
   const [prevTargetCoordinates, setPrevTargetCoordinates] = useState([
     initialTargetRow,
     initialTargetColumn,
   ]);
 
-  // Keeps track of the status of the node two steps back from the start node (in this case)
-  // - this is made so that the start node never has the same position as the target node, instead it skips it to the next node.
   const [nodeTwoStepsBack, setNodeTwoStepsBack] = useState([
     prevCoordinates[0],
     prevCoordinates[1],
   ]);
 
-  // Keeps track of the status of the node two steps back from the target node (in this case)
-  // - this is made so that the target node never has the same position as the start node, instead it skips it to the next node.
   const [targetTwoStepsBack, setTargetTwoStepsBack] = useState([
     prevTargetCoordinates[0],
     prevTargetCoordinates[1],
   ]);
 
-  // Checks whether the start/target node is currently on a wall node - if it is, the wall node is temporarily replaces with the
-  // start/target node. Once the start/target node leaves the wall node, it is re-rendered into a wall node again.
   const [isOnWallNode, setIsOnWallNode] = useState(false);
   const [isOnWeightNode, setIsOnWeightNode] = useState(false);
 
-  // Checks if the algorithm animation is done
   const [algoDone, setAlgoDone] = useState(false);
-  // Disables functionality while algo is running
   const [disable, setDisable] = useState(false);
 
-  const weightKeyPressed = useKeyPress('w');
+  const weightKeyPressed = useKeyPress("w");
 
-  // COMMENT ABOUT LINE 139 - 203 -> these functions make it possible to see the previously ran algorithm pattern. It updates the pattern based on where you move the nodes. (staticly instead of animating it)
-  // for the new position of the start / target node when moving the start/target node. Seemed a bit overkill to do this functionality
-  // So I decided to run with a version which clears the grid when moving the start/target node instead.
-
-  // const removeStatic = grid => {
-  //   grid.forEach(row => {
-  //     row.forEach(node => {
-  //       const nodeById = document.getElementById(`${node.row}-${node.column}`);
-  //       nodeById.classList.remove('visited-reset');
-  //       nodeById.classList.remove('shortest-reset');
-  //       if (node.status === 'target') {
-  //         nodeById.classList.remove('start');
-  //       }
-  //     });
-  //   });
-  //   setAlgoDone(false);
-  // };
-
-  // const shortestPath = nodesInShortestPath => {
-  //   for (let i = 0; i < nodesInShortestPath.length; i++) {
-  //     const node = nodesInShortestPath[i];
-  //     const previousNode = nodesInShortestPath[i - 1];
-  //     if (node.status === 'target') {
-  //       document.getElementById(`${node.row}-${node.column}`).className =
-  //         'node shortest-reset target start';
-  //     } else {
-  //       document.getElementById(`${node.row}-${node.column}`).className =
-  //         'node shortest-reset start';
-  //     }
-
-  //     if (previousNode && previousNode.status !== 'start') {
-  //       document
-  //         .getElementById(`${previousNode.row}-${previousNode.column}`)
-  //         .classList.remove('start');
-  //     }
-  //   }
-  // };
-
-  // const runStaticDijkstra = () => {
-  //   resetGrid();
-  //   // removePattern(grid);
-  //   const visitedNodesInOrder = dijkstra(
-  //     grid,
-  //     grid[currentStartCoordinates[0]][currentStartCoordinates[1]],
-  //     grid[currentTargetCoordinates[0]][currentTargetCoordinates[1]]
-  //   );
-  //   const nodesInShortestPath = getNodesInShortestPath(
-  //     grid[currentTargetCoordinates[0]][currentTargetCoordinates[1]]
-  //   );
-  //   for (let i = 0; i <= visitedNodesInOrder.length; i++) {
-  //     if (i === visitedNodesInOrder.length) {
-  //       shortestPath(nodesInShortestPath);
-  //     }
-  //     const node = visitedNodesInOrder[i];
-  //     if (node) {
-  //       if (node.status === 'start') {
-  //         document.getElementById(`${node.row}-${node.column}`).className =
-  //           'node start visited-reset';
-  //       } else {
-  //         document.getElementById(`${node.row}-${node.column}`).className =
-  //           'node visited-reset';
-  //       }
-  //     }
-  //   }
-  // };
-
-  // Function to move the start node on mouse enter.
-  // Replaces old start node with a normal node,
-  // then adds the new start node to the current position in the grid
-  // Returns a new grid with updated start node
   const moveStartNode = (grid, row, column) => {
     const newGrid = grid.slice();
     const currentNode = grid[row][column];
     const previousNode = grid[prevCoordinates[0]][prevCoordinates[1]];
     const twoStepsBack = grid[nodeTwoStepsBack[0]][nodeTwoStepsBack[1]];
 
-    // Simply removes the old algorithm pattern if moving start node when algorithm is done running
     if (algoDone) {
       removePattern(grid);
 
       resetGrid(grid);
     }
 
-    if (twoStepsBack.status === 'start' && previousNode.status === 'target') {
+    if (twoStepsBack.status === "start" && previousNode.status === "target") {
       let newNode = {
         ...twoStepsBack,
-        status: '',
+        status: "",
       };
       newGrid[nodeTwoStepsBack[0]][nodeTwoStepsBack[1]] = newNode;
     }
 
-    if (currentNode.status === '') {
+    if (currentNode.status === "") {
       setIsOnWallNode(false);
       setIsOnWeightNode(false);
       let newNode = {
         ...currentNode,
-        status: 'start',
+        status: "start",
         distance: Infinity,
         isVisited: false,
         shortest: false,
       };
 
       newGrid[row][column] = newNode;
-    } else if (currentNode.status === 'wall') {
+    } else if (currentNode.status === "wall") {
       setIsOnWallNode(true);
 
       let newNode = {
         ...currentNode,
-        status: 'start',
+        status: "start",
       };
 
       newGrid[row][column] = newNode;
     }
 
-    if (currentNode.status === 'weight') {
+    if (currentNode.status === "weight") {
       setIsOnWeightNode(true);
 
       let newNode = {
         ...currentNode,
-        status: 'start',
+        status: "start",
       };
 
       newGrid[row][column] = newNode;
     }
 
-    if (previousNode.status === 'start' && !isOnWallNode) {
+    if (previousNode.status === "start" && !isOnWallNode) {
       let newPreviousNode = {
         ...previousNode,
         isVisited: false,
-        status: '',
+        status: "",
       };
       newGrid[prevCoordinates[0]][prevCoordinates[1]] = newPreviousNode;
-    } else if (isOnWallNode && previousNode.status === 'start') {
+    } else if (isOnWallNode && previousNode.status === "start") {
       let newPreviousNode = {
         ...previousNode,
-        status: 'wall',
+        status: "wall",
       };
 
       newGrid[prevCoordinates[0]][prevCoordinates[1]] = newPreviousNode;
@@ -280,20 +182,15 @@ const Board = () => {
     return newGrid;
   };
 
-  // Checks whether the node at (row, column) is the current start node
   const getStartNode = (grid, row, column) => {
     const node = grid[row][column];
-    if (node.status === 'start') {
+    if (node.status === "start") {
       return node;
     } else {
       return false;
     }
   };
 
-  // Function to move the target node on mouse enter. (same as moveStartNode)
-  // Replaces old target node with a normal node,
-  // then adds the new target node to the current position in the grid
-  // Returns a new grid with updated target node
   const moveTargetNode = (grid, row, column) => {
     const newGrid = grid.slice();
     const currentNode = grid[row][column];
@@ -301,119 +198,114 @@ const Board = () => {
       grid[prevTargetCoordinates[0]][prevTargetCoordinates[1]];
     const twoStepsBack = grid[targetTwoStepsBack[0]][targetTwoStepsBack[1]];
 
-    // Simply removes the old dijkstras pattern if moving start node when algorithm is done running
     if (algoDone) {
       removePattern(grid);
       resetGrid(grid);
     }
 
-    if (twoStepsBack.status === 'target' && previousNode.status === 'start') {
+    if (twoStepsBack.status === "target" && previousNode.status === "start") {
       let newNode = {
         ...twoStepsBack,
-        status: '',
+        status: "",
       };
       newGrid[targetTwoStepsBack[0]][targetTwoStepsBack[1]] = newNode;
     }
 
-    if (currentNode.status === '') {
+    if (currentNode.status === "") {
       setIsOnWallNode(false);
       setIsOnWeightNode(false);
       let newNode = {
         ...currentNode,
-        status: 'target',
+        status: "target",
       };
 
       newGrid[row][column] = newNode;
-    } else if (currentNode.status === 'wall') {
+    } else if (currentNode.status === "wall") {
       setIsOnWallNode(true);
       let newNode = {
         ...currentNode,
-        status: 'target',
+        status: "target",
       };
 
       newGrid[row][column] = newNode;
     }
 
-    if (previousNode.status === 'target' && !isOnWallNode) {
+    if (previousNode.status === "target" && !isOnWallNode) {
       let newPreviousNode = {
         ...previousNode,
-        status: '',
+        status: "",
       };
 
-      newGrid[prevTargetCoordinates[0]][
-        prevTargetCoordinates[1]
-      ] = newPreviousNode;
-    } else if (isOnWallNode && previousNode.status === 'target') {
+      newGrid[prevTargetCoordinates[0]][prevTargetCoordinates[1]] =
+        newPreviousNode;
+    } else if (isOnWallNode && previousNode.status === "target") {
       let newPreviousNode = {
         ...previousNode,
-        status: 'wall',
+        status: "wall",
       };
-      newGrid[prevTargetCoordinates[0]][
-        prevTargetCoordinates[1]
-      ] = newPreviousNode;
+      newGrid[prevTargetCoordinates[0]][prevTargetCoordinates[1]] =
+        newPreviousNode;
     }
 
     return newGrid;
   };
 
-  // Checks whether the node at (row, column) is the current target node
   const getTargetNode = (grid, row, column) => {
     const node = grid[row][column];
-    if (node.status === 'target') {
+    if (node.status === "target") {
       return node;
     } else {
       return false;
     }
   };
 
-  //Allows to build walls when mouse is held over the nodes
   const buildWalls = (grid, row, column) => {
     const node = grid[row][column];
-    if (weightKeyPressed && algorithm !== 'dfs') {
-      if (node.status === '') {
+    if (weightKeyPressed && algorithm !== "dfs") {
+      if (node.status === "") {
         document
           .getElementById(`${node.row}-${node.column}`)
-          .classList.add('weight');
-      } else if (node.status === 'weight') {
+          .classList.add("weight");
+      } else if (node.status === "weight") {
         document
           .getElementById(`${node.row}-${node.column}`)
-          .classList.remove('weight');
+          .classList.remove("weight");
       }
     } else {
-      if (node.status === 'wall') {
+      if (node.status === "wall") {
         document
           .getElementById(`${node.row}-${node.column}`)
-          .classList.remove('wall');
-      } else if (node.status === '') {
+          .classList.remove("wall");
+      } else if (node.status === "") {
         document
           .getElementById(`${node.row}-${node.column}`)
-          .classList.add('wall');
+          .classList.add("wall");
       }
     }
   };
 
-  const updateWalls = grid => {
+  const updateWalls = (grid) => {
     const newGrid = grid.slice();
-    grid.forEach(row => {
-      row.forEach(node => {
+    grid.forEach((row) => {
+      row.forEach((node) => {
         const nodeById = document.getElementById(`${node.row}-${node.column}`);
-        if (nodeById.classList.contains('weight')) {
+        if (nodeById.classList.contains("weight")) {
           let newNode = {
             ...node,
-            status: 'weight',
+            status: "weight",
           };
           newGrid[node.row][node.column] = newNode;
         }
-        if (nodeById.classList.contains('wall')) {
+        if (nodeById.classList.contains("wall")) {
           let newNode = {
             ...node,
-            status: 'wall',
+            status: "wall",
           };
           newGrid[node.row][node.column] = newNode;
-        } else if (nodeById.className === 'node') {
+        } else if (nodeById.className === "node") {
           let newNode = {
             ...node,
-            status: '',
+            status: "",
           };
           newGrid[node.row][node.column] = newNode;
         }
@@ -422,11 +314,7 @@ const Board = () => {
     setGrid(newGrid);
   };
 
-  // Runs a function based on which node is pressed
   const handleMouseDown = (row, column) => {
-    // removePattern(grid);
-    // resetGrid();
-
     if (getStartNode(grid, row, column) && !disable) {
       setIsStartNodePressed(true);
     } else if (getTargetNode(grid, row, column) && !disable) {
@@ -437,7 +325,6 @@ const Board = () => {
     }
   };
 
-  // Checks which node is pressed, and runs a function accordingly. Stops running when the node is released (onmouseup).
   const handleMouseEnter = (row, column) => {
     if (!isStartNodePressed && !isTargetNodePressed && !pressedNode) return;
 
@@ -446,7 +333,7 @@ const Board = () => {
 
       setPrevCoordinates([row, column]);
       setCurrentStartCoordinates([row, column]);
-      if (grid[row][column].status !== 'target') {
+      if (grid[row][column].status !== "target") {
         const newGrid = moveStartNode(grid, row, column);
         setGrid(newGrid);
       }
@@ -457,7 +344,7 @@ const Board = () => {
       ]);
       setPrevTargetCoordinates([row, column]);
       setCurrentTargetCoordinates([row, column]);
-      if (grid[row][column].status !== 'start') {
+      if (grid[row][column].status !== "start") {
         const newGrid = moveTargetNode(grid, row, column);
         setGrid(newGrid);
       }
@@ -466,7 +353,6 @@ const Board = () => {
     }
   };
 
-  // No longer clicking, stop moving start/target node or stop building walls
   const handleMouseUp = () => {
     setPressedNode(false);
     setIsStartNodePressed(false);
@@ -474,7 +360,6 @@ const Board = () => {
     updateWalls(grid);
   };
 
-  // Visualizes Dijkstras algorithm
   const visualizeDijkstras = () => {
     if (!disable) {
       removePattern(grid);
@@ -492,8 +377,6 @@ const Board = () => {
     }
   };
 
-
-// Visualizes A* Search algorithm
   const visualizeAstar = () => {
     if (!disable) {
       removePattern(grid);
@@ -511,8 +394,6 @@ const Board = () => {
     }
   };
 
-
-  // Visualizes Depth-first Search algorithm
   const visualizeDfs = () => {
     if (!disable) {
       removePattern(grid);
@@ -538,69 +419,69 @@ const Board = () => {
       setTimeout(() => {
         const node = visitedNodesInOrder[i];
         if (node) {
-          if (node.status === 'target') {
+          if (node.status === "target") {
             setAlgoDone(true);
           }
 
-          if (node.status === 'start') {
+          if (node.status === "start") {
             document.getElementById(`${node.row}-${node.column}`).className =
-              'node start visited';
-          } else if (node.status === 'weight') {
+              "node start visited";
+          } else if (node.status === "weight") {
             document.getElementById(`${node.row}-${node.column}`).className =
-              'node visited weight';
+              "node visited weight";
           } else {
             document.getElementById(`${node.row}-${node.column}`).className =
-              'node visited';
+              "node visited";
           }
         }
       }, speedValue * i);
     }
   };
 
-  const animateShortestPath = nodesInShortestPath => {
+  const animateShortestPath = (nodesInShortestPath) => {
     for (let i = 0; i < nodesInShortestPath.length; i++) {
       setTimeout(() => {
         const node = nodesInShortestPath[i];
         const previousNode = nodesInShortestPath[i - 1];
 
-        if (node.status === 'target') {
+        if (node.status === "target") {
           setDisable(false);
           document.getElementById(`${node.row}-${node.column}`).className =
-            'node node-shortest-path target start';
+            "node node-shortest-path target start";
         } else {
           document.getElementById(`${node.row}-${node.column}`).className =
-            'node node-shortest-path start';
+            "node node-shortest-path start";
         }
 
-        if (previousNode && previousNode.status !== 'start') {
+        if (previousNode && previousNode.status !== "start") {
           document
             .getElementById(`${previousNode.row}-${previousNode.column}`)
-            .classList.remove('start');
+            .classList.remove("start");
         }
       }, 50 * i);
     }
   };
 
-  const clearWalls = grid => {
+  const clearWalls = (grid) => {
     if (!disable) {
       removePattern(grid);
       const newGrid = grid.slice();
-      grid.forEach(row => {
-        row.forEach(node => {
-          if (node.status === 'wall') {
+      grid.forEach((row) => {
+        row.forEach((node) => {
+          if (node.status === "wall") {
             let newNode = {
               ...node,
-              status: '',
+              status: "",
             };
             newGrid[node.row][node.column] = newNode;
           }
-          if (node.status === 'weight') {
+          if (node.status === "weight") {
             document
               .getElementById(`${node.row}-${node.column}`)
-              .classList.remove('weight');
+              .classList.remove("weight");
             let newNode = {
               ...node,
-              status: '',
+              status: "",
             };
             newGrid[node.row][node.column] = newNode;
           }
@@ -617,29 +498,25 @@ const Board = () => {
     }
   };
 
-
-  // Removes the visited nodes pattern
-  const removePattern = grid => {
-    grid.forEach(row => {
-      row.forEach(node => {
+  const removePattern = (grid) => {
+    grid.forEach((row) => {
+      row.forEach((node) => {
         const nodeById = document.getElementById(`${node.row}-${node.column}`);
-        nodeById.classList.remove('visited');
-        nodeById.classList.remove('node-shortest-path');
-        if (node.status === 'target') {
-          nodeById.classList.remove('start');
+        nodeById.classList.remove("visited");
+        nodeById.classList.remove("node-shortest-path");
+        if (node.status === "target") {
+          nodeById.classList.remove("start");
         }
       });
     });
     setAlgoDone(false);
   };
 
-
-  // Resets the nodes (not start or target positions)
-  const resetGrid = grid => {
+  const resetGrid = (grid) => {
     const newGrid = grid.slice();
 
-    grid.forEach(row => {
-      row.forEach(node => {
+    grid.forEach((row) => {
+      row.forEach((node) => {
         let newNode = {
           ...node,
           isVisited: false,
@@ -655,7 +532,6 @@ const Board = () => {
     setGrid(newGrid);
   };
 
-  // Resets the entire board(even start and target node positions)
   const resetAll = () => {
     if (!disable) {
       removePattern(grid);
@@ -666,17 +542,17 @@ const Board = () => {
       setPrevCoordinates([initialStartRow, initialStartColumn]);
       setPrevTargetCoordinates([initialTargetRow, initialTargetColumn]);
 
-      newGrid.forEach(row => {
-        row.forEach(node => {
+      newGrid.forEach((row) => {
+        row.forEach((node) => {
           let newNode = {
             ...node,
             status:
               node.row === initialStartRow && node.column === initialStartColumn
-                ? 'start'
+                ? "start"
                 : node.row === initialTargetRow &&
                   node.column === initialTargetColumn
-                ? 'target'
-                : '',
+                ? "target"
+                : "",
             isVisited: false,
             shortest: false,
             distance: Infinity,
@@ -690,14 +566,12 @@ const Board = () => {
     }
   };
 
-
-  // Starts visualizing the algorithm based on which one is picked
   const startVisualize = () => {
-    if (algorithm === 'dijkstra') {
+    if (algorithm === "dijkstra") {
       visualizeDijkstras();
-    } else if (algorithm === 'astar') {
+    } else if (algorithm === "astar") {
       visualizeAstar();
-    } else if (algorithm === 'dfs') {
+    } else if (algorithm === "dfs") {
       visualizeDfs();
     }
   };
@@ -709,7 +583,7 @@ const Board = () => {
 
       let newNode = {
         ...node,
-        status: 'wall',
+        status: "wall",
       };
       newGrid[wall[0]][wall[1]] = newNode;
     }
@@ -724,7 +598,7 @@ const Board = () => {
 
       let newNode = {
         ...node,
-        status: 'weight',
+        status: "weight",
       };
       newGrid[weight[0]][weight[1]] = newNode;
     }
@@ -748,7 +622,7 @@ const Board = () => {
       const node = grid[wall[0]][wall[1]];
       setTimeout(() => {
         document.getElementById(`${node.row}-${node.column}`).className =
-          'node wall';
+          "node wall";
       }, 20 * i);
     }
   };
@@ -769,13 +643,11 @@ const Board = () => {
       const node = grid[weight[0]][weight[1]];
       setTimeout(() => {
         document.getElementById(`${node.row}-${node.column}`).className =
-          'node weight';
+          "node weight";
       }, 20 * i);
     }
   };
 
-
-  // Animates recursive divison maze with walls
   const recursiveDivisionMaze = () => {
     if (!disable) {
       removePattern(grid);
@@ -796,7 +668,6 @@ const Board = () => {
     }
   };
 
-  // Animates random maze with walls
   const buildRandomMaze = () => {
     if (!disable) {
       removePattern(grid);
@@ -814,8 +685,6 @@ const Board = () => {
     }
   };
 
-
-  // Animates random maze with weights
   const buildRandomWeightMaze = () => {
     if (!disable) {
       removePattern(grid);
@@ -842,24 +711,24 @@ const Board = () => {
         disable={disable}
         setDisable={setDisable}
         algorithm={algorithm}
-        setAlgorithm={e => setAlgorithm(e)}
+        setAlgorithm={(e) => setAlgorithm(e)}
         algorithmSpeed={algorithmSpeed}
-        setAlgorithmSpeed={e => setAlgorithmSpeed(e)}
+        setAlgorithmSpeed={(e) => setAlgorithmSpeed(e)}
         speedValue={speedValue}
-        setSpeedValue={e => setSpeedValue(e)}
+        setSpeedValue={(e) => setSpeedValue(e)}
         clearWalls={() => clearWalls(grid)}
         recursiveDivisionMaze={() => recursiveDivisionMaze()}
         buildRandomMaze={() => buildRandomMaze()}
         buildRandomWeightMaze={() => buildRandomWeightMaze()}
         showTutorial={showTutorial}
-        setShowTutorial={e => setShowTutorial(e)}
+        setShowTutorial={(e) => setShowTutorial(e)}
       />
 
       <Tutorial
         showTutorial={showTutorial}
         setShowTutorial={() => setShowTutorial()}
       />
-      <div className='container'>
+      <div className="container">
         <table className={styles.grid}>
           <tbody>
             {grid.map((row, rowIdx) => {
@@ -900,36 +769,30 @@ const Board = () => {
   );
 };
 
-
-// Funtion used  to check if "W"-key is pressed. Used to build weights (can be used for other keys as well, not just "W"-key)
 function useKeyPress(targetKey) {
-  // State for keeping track of whether key is pressed
   const [keyPressed, setKeyPressed] = useState(false);
 
-  // If pressed key is our target key then set to true
   function downHandler({ key }) {
     if (key === targetKey) {
       setKeyPressed(true);
     }
   }
 
-  // If released key is our target key then set to false
   const upHandler = ({ key }) => {
     if (key === targetKey) {
       setKeyPressed(false);
     }
   };
 
-  // Add event listeners
   useEffect(() => {
-    window.addEventListener('keydown', downHandler);
-    window.addEventListener('keyup', upHandler);
-    // Remove event listeners on cleanup
+    window.addEventListener("keydown", downHandler);
+    window.addEventListener("keyup", upHandler);
+
     return () => {
-      window.removeEventListener('keydown', downHandler);
-      window.removeEventListener('keyup', upHandler);
+      window.removeEventListener("keydown", downHandler);
+      window.removeEventListener("keyup", upHandler);
     };
-  }, []); // Empty array ensures that effect is only run on mount and unmount
+  }, []);
 
   return keyPressed;
 }
