@@ -109,156 +109,6 @@ const Board = () => {
 
   const weightKeyPressed = useKeyPress("w");
 
-  const moveStartNode = (grid, row, column) => {
-    const newGrid = grid.slice();
-    const currentNode = grid[row][column];
-    const previousNode = grid[prevCoordinates[0]][prevCoordinates[1]];
-    const twoStepsBack = grid[nodeTwoStepsBack[0]][nodeTwoStepsBack[1]];
-
-    if (algoDone) {
-      removePattern(grid);
-
-      resetGrid(grid);
-    }
-
-    if (twoStepsBack.status === "start" && previousNode.status === "target") {
-      let newNode = {
-        ...twoStepsBack,
-        status: "",
-      };
-      newGrid[nodeTwoStepsBack[0]][nodeTwoStepsBack[1]] = newNode;
-    }
-
-    if (currentNode.status === "") {
-      setIsOnWallNode(false);
-      setIsOnWeightNode(false);
-      let newNode = {
-        ...currentNode,
-        status: "start",
-        distance: Infinity,
-        isVisited: false,
-        shortest: false,
-      };
-
-      newGrid[row][column] = newNode;
-    } else if (currentNode.status === "wall") {
-      setIsOnWallNode(true);
-
-      let newNode = {
-        ...currentNode,
-        status: "start",
-      };
-
-      newGrid[row][column] = newNode;
-    }
-
-    if (currentNode.status === "weight") {
-      setIsOnWeightNode(true);
-
-      let newNode = {
-        ...currentNode,
-        status: "start",
-      };
-
-      newGrid[row][column] = newNode;
-    }
-
-    if (previousNode.status === "start" && !isOnWallNode) {
-      let newPreviousNode = {
-        ...previousNode,
-        isVisited: false,
-        status: "",
-      };
-      newGrid[prevCoordinates[0]][prevCoordinates[1]] = newPreviousNode;
-    } else if (isOnWallNode && previousNode.status === "start") {
-      let newPreviousNode = {
-        ...previousNode,
-        status: "wall",
-      };
-
-      newGrid[prevCoordinates[0]][prevCoordinates[1]] = newPreviousNode;
-    }
-
-    return newGrid;
-  };
-
-  const getStartNode = (grid, row, column) => {
-    const node = grid[row][column];
-    if (node.status === "start") {
-      return node;
-    } else {
-      return false;
-    }
-  };
-
-  const moveTargetNode = (grid, row, column) => {
-    const newGrid = grid.slice();
-    const currentNode = grid[row][column];
-    const previousNode =
-      grid[prevTargetCoordinates[0]][prevTargetCoordinates[1]];
-    const twoStepsBack = grid[targetTwoStepsBack[0]][targetTwoStepsBack[1]];
-
-    if (algoDone) {
-      removePattern(grid);
-      resetGrid(grid);
-    }
-
-    if (twoStepsBack.status === "target" && previousNode.status === "start") {
-      let newNode = {
-        ...twoStepsBack,
-        status: "",
-      };
-      newGrid[targetTwoStepsBack[0]][targetTwoStepsBack[1]] = newNode;
-    }
-
-    if (currentNode.status === "") {
-      setIsOnWallNode(false);
-      setIsOnWeightNode(false);
-      let newNode = {
-        ...currentNode,
-        status: "target",
-      };
-
-      newGrid[row][column] = newNode;
-    } else if (currentNode.status === "wall") {
-      setIsOnWallNode(true);
-      let newNode = {
-        ...currentNode,
-        status: "target",
-      };
-
-      newGrid[row][column] = newNode;
-    }
-
-    if (previousNode.status === "target" && !isOnWallNode) {
-      let newPreviousNode = {
-        ...previousNode,
-        status: "",
-      };
-
-      newGrid[prevTargetCoordinates[0]][prevTargetCoordinates[1]] =
-        newPreviousNode;
-    } else if (isOnWallNode && previousNode.status === "target") {
-      let newPreviousNode = {
-        ...previousNode,
-        status: "wall",
-      };
-      newGrid[prevTargetCoordinates[0]][prevTargetCoordinates[1]] =
-        newPreviousNode;
-    }
-
-    return newGrid;
-  };
-
-  const getTargetNode = (grid, row, column) => {
-    const node = grid[row][column];
-    if (node.status === "target") {
-      return node;
-    } else {
-      return false;
-    }
-  };
-
   const buildWalls = (grid, row, column) => {
     const node = grid[row][column];
     if (weightKeyPressed && algorithm !== "dfs") {
@@ -315,48 +165,22 @@ const Board = () => {
   };
 
   const handleMouseDown = (row, column) => {
-    if (getStartNode(grid, row, column) && !disable) {
-      setIsStartNodePressed(true);
-    } else if (getTargetNode(grid, row, column) && !disable) {
-      setIsTargetNodePressed(true);
-    } else if (!disable) {
+    if (!disable) {
       setPressedNode(true);
       buildWalls(grid, row, column);
     }
   };
 
   const handleMouseEnter = (row, column) => {
-    if (!isStartNodePressed && !isTargetNodePressed && !pressedNode) return;
+    if (!pressedNode) return;
 
-    if (isStartNodePressed) {
-      setNodeTwoStepsBack([prevCoordinates[0], prevCoordinates[1]]);
-
-      setPrevCoordinates([row, column]);
-      setCurrentStartCoordinates([row, column]);
-      if (grid[row][column].status !== "target") {
-        const newGrid = moveStartNode(grid, row, column);
-        setGrid(newGrid);
-      }
-    } else if (isTargetNodePressed) {
-      setTargetTwoStepsBack([
-        prevTargetCoordinates[0],
-        prevTargetCoordinates[1],
-      ]);
-      setPrevTargetCoordinates([row, column]);
-      setCurrentTargetCoordinates([row, column]);
-      if (grid[row][column].status !== "start") {
-        const newGrid = moveTargetNode(grid, row, column);
-        setGrid(newGrid);
-      }
-    } else if (pressedNode) {
+    if (pressedNode) {
       buildWalls(grid, row, column);
     }
   };
 
   const handleMouseUp = () => {
     setPressedNode(false);
-    setIsStartNodePressed(false);
-    setIsTargetNodePressed(false);
     updateWalls(grid);
   };
 
